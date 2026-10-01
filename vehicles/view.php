@@ -111,7 +111,7 @@
                     </p>
                 </div>
 
-                <a href="#" class="secondary-action">
+                <a href="../documents/add.php" class="secondary-action">
                     <i class="bi bi-plus-lg"></i>
                     Add Document
                 </a>
