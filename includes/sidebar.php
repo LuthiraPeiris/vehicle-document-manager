@@ -35,10 +35,11 @@
 
         </a>
 
-        <a href="#" class="sidebar-link">
+        <a href="/vehicle-document-manager/documents/renewals.php"
+           class="sidebar-link">
 
-            <i class="bi bi-arrow-repeat"></i>
-            <span>Renewals</span>
+           <i class="bi bi-arrow-repeat"></i>
+           <span>Renewals</span>
 
         </a>
     </div>
