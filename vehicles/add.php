@@ -1,15 +1,176 @@
+
 <?php
+
 require_once __DIR__ . '/../includes/auth-check.php';
+require_once __DIR__ . '/../config/database.php';
+
+$errors = [];
+
+$registrationNumber = '';
+$vehicleType = '';
+$make = '';
+$model = '';
+$year = '';
+
+$userId = (int) $_SESSION['user_id'];
+
+// Generate a CSRF token.
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+$csrfToken = $_SESSION['csrf_token'];
+
+$allowedVehicleTypes = [
+    'car',
+    'van',
+    'suv',
+    'motorcycle',
+    'three_wheeler',
+    'bus',
+    'lorry',
+    'other'
+];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $registrationNumber = strtoupper(
+        trim($_POST['registration_number'] ?? '')
+    );
+
+    $vehicleType = trim($_POST['vehicle_type'] ?? '');
+    $make = trim($_POST['make'] ?? '');
+    $model = trim($_POST['model'] ?? '');
+    $year = trim($_POST['year'] ?? '');
+    $submittedToken = $_POST['csrf_token'] ?? '';
+
+    // Validate CSRF token.
+    if (
+        !is_string($submittedToken) ||
+        !hash_equals($_SESSION['csrf_token'], $submittedToken)
+    ) {
+        $errors[] = 'Your session has expired. Please refresh the page and try again.';
+    }
+
+    // Registration number validation.
+    if ($registrationNumber === '') {
+        $errors[] = 'Registration number is required.';
+    } elseif (strlen($registrationNumber) > 50) {
+        $errors[] = 'Registration number cannot exceed 50 characters.';
+    }
+
+    // Vehicle type validation.
+    if (!in_array($vehicleType, $allowedVehicleTypes, true)) {
+        $errors[] = 'Please select a valid vehicle type.';
+    }
+
+    // Optional make and model validation.
+    if (strlen($make) > 100) {
+        $errors[] = 'Make cannot exceed 100 characters.';
+    }
+
+    if (strlen($model) > 100) {
+        $errors[] = 'Model cannot exceed 100 characters.';
+    }
+
+    // Optional manufacturing year validation.
+    $manufacturingYear = null;
+
+    if ($year !== '') {
+        $validatedYear = filter_var($year, FILTER_VALIDATE_INT);
+
+        if (
+            $validatedYear === false ||
+            $validatedYear < 1900 ||
+            $validatedYear > 2100
+        ) {
+            $errors[] = 'Please enter a valid manufacturing year between 1900 and 2100.';
+        } else {
+            $manufacturingYear = $validatedYear;
+        }
+    }
+
+    // Save the vehicle if validation succeeds.
+    if (empty($errors)) {
+
+        try {
+            // Prevent duplicate registration numbers for this user.
+            $duplicateStmt = $pdo->prepare(
+                'SELECT id
+                 FROM vehicles
+                 WHERE user_id = :user_id
+                   AND LOWER(registration_number) = LOWER(:registration_number)
+                 LIMIT 1'
+            );
+
+            $duplicateStmt->execute([
+                'user_id' => $userId,
+                'registration_number' => $registrationNumber
+            ]);
+
+            if ($duplicateStmt->fetch()) {
+                $errors[] = 'You have already registered a vehicle with this registration number.';
+            } else {
+
+                $insertStmt = $pdo->prepare(
+                    'INSERT INTO vehicles (
+                        user_id,
+                        registration_number,
+                        vehicle_type,
+                        make,
+                        model,
+                        manufacturing_year
+                    ) VALUES (
+                        :user_id,
+                        :registration_number,
+                        :vehicle_type,
+                        :make,
+                        :model,
+                        :manufacturing_year
+                    )'
+                );
+
+                $insertStmt->execute([
+                    'user_id' => $userId,
+                    'registration_number' => $registrationNumber,
+                    'vehicle_type' => $vehicleType,
+                    'make' => $make !== '' ? $make : null,
+                    'model' => $model !== '' ? $model : null,
+                    'manufacturing_year' => $manufacturingYear
+                ]);
+
+                // Rotate the CSRF token after a successful operation.
+                $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
+                // Redirect after saving to prevent duplicate form submission.
+                header('Location: index.php?added=1');
+                exit;
+            }
+
+        } catch (PDOException $e) {
+            error_log('Add vehicle database error: ' . $e->getMessage());
+
+            $errors[] = 'Unable to save the vehicle right now. Please try again.';
+        }
+    }
+}
+
+function vehicleFormEscape($value): string
+{
+    return htmlspecialchars((string) ($value ?? ''), ENT_QUOTES, 'UTF-8');
+}
+
+include __DIR__ . '/../includes/header.php';
+
 ?>
-<?php include '../includes/header.php'; ?>
 
 <div class="app-container">
 
-    <?php include '../includes/sidebar.php'; ?>
+    <?php include __DIR__ . '/../includes/sidebar.php'; ?>
 
     <main class="main-content">
 
-        <?php include '../includes/navbar.php'; ?>
+        <?php include __DIR__ . '/../includes/navbar.php'; ?>
 
         <div class="content-wrapper">
 
@@ -31,7 +192,6 @@ require_once __DIR__ . '/../includes/auth-check.php';
 
             </div>
 
-
             <!-- Form Card -->
             <div class="form-card">
 
@@ -51,8 +211,27 @@ require_once __DIR__ . '/../includes/auth-check.php';
 
                 </div>
 
+                <?php if (!empty($errors)): ?>
 
-                <form id="vehicleForm">
+                    <div class="alert alert-danger" role="alert">
+                        <ul class="mb-0">
+                            <?php foreach ($errors as $error): ?>
+                                <li>
+                                    <?= vehicleFormEscape($error) ?>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+
+                <?php endif; ?>
+
+                <form id="vehicleForm" method="POST" action="add.php">
+
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="<?= vehicleFormEscape($csrfToken) ?>"
+                    >
 
                     <div class="form-grid">
 
@@ -69,6 +248,10 @@ require_once __DIR__ . '/../includes/auth-check.php';
                                 id="registration_number"
                                 name="registration_number"
                                 placeholder="e.g. ABC-1234"
+                                value="<?= vehicleFormEscape($registrationNumber) ?>"
+                                maxlength="50"
+                                autocomplete="off"
+                                required
                             >
 
                             <small>
@@ -76,7 +259,6 @@ require_once __DIR__ . '/../includes/auth-check.php';
                             </small>
 
                         </div>
-
 
                         <!-- Vehicle Type -->
                         <div class="form-group">
@@ -89,48 +271,48 @@ require_once __DIR__ . '/../includes/auth-check.php';
                             <select
                                 id="vehicle_type"
                                 name="vehicle_type"
+                                required
                             >
 
                                 <option value="">
                                     Select vehicle type
                                 </option>
 
-                                <option value="car">
+                                <option value="car" <?= $vehicleType === 'car' ? 'selected' : '' ?>>
                                     Car
                                 </option>
 
-                                <option value="van">
+                                <option value="van" <?= $vehicleType === 'van' ? 'selected' : '' ?>>
                                     Van
                                 </option>
 
-                                <option value="suv">
+                                <option value="suv" <?= $vehicleType === 'suv' ? 'selected' : '' ?>>
                                     SUV
                                 </option>
 
-                                <option value="motorcycle">
+                                <option value="motorcycle" <?= $vehicleType === 'motorcycle' ? 'selected' : '' ?>>
                                     Motorcycle
                                 </option>
 
-                                <option value="three_wheeler">
+                                <option value="three_wheeler" <?= $vehicleType === 'three_wheeler' ? 'selected' : '' ?>>
                                     Three Wheeler
                                 </option>
 
-                                <option value="bus">
+                                <option value="bus" <?= $vehicleType === 'bus' ? 'selected' : '' ?>>
                                     Bus
                                 </option>
 
-                                <option value="lorry">
+                                <option value="lorry" <?= $vehicleType === 'lorry' ? 'selected' : '' ?>>
                                     Lorry
                                 </option>
 
-                                <option value="other">
+                                <option value="other" <?= $vehicleType === 'other' ? 'selected' : '' ?>>
                                     Other
                                 </option>
 
                             </select>
 
                         </div>
-
 
                         <!-- Make -->
                         <div class="form-group">
@@ -144,10 +326,11 @@ require_once __DIR__ . '/../includes/auth-check.php';
                                 id="make"
                                 name="make"
                                 placeholder="e.g. Toyota"
+                                value="<?= vehicleFormEscape($make) ?>"
+                                maxlength="100"
                             >
 
                         </div>
-
 
                         <!-- Model -->
                         <div class="form-group">
@@ -161,12 +344,13 @@ require_once __DIR__ . '/../includes/auth-check.php';
                                 id="model"
                                 name="model"
                                 placeholder="e.g. Corolla"
+                                value="<?= vehicleFormEscape($model) ?>"
+                                maxlength="100"
                             >
 
                         </div>
 
-
-                        <!-- Year -->
+                        <!-- Manufacturing Year -->
                         <div class="form-group">
 
                             <label for="year">
@@ -178,6 +362,7 @@ require_once __DIR__ . '/../includes/auth-check.php';
                                 id="year"
                                 name="year"
                                 placeholder="e.g. 2020"
+                                value="<?= vehicleFormEscape($year) ?>"
                                 min="1900"
                                 max="2100"
                             >
@@ -185,7 +370,6 @@ require_once __DIR__ . '/../includes/auth-check.php';
                         </div>
 
                     </div>
-
 
                     <!-- Documents Introduction -->
                     <div class="form-divider"></div>
@@ -206,7 +390,6 @@ require_once __DIR__ . '/../includes/auth-check.php';
                         </div>
 
                     </div>
-
 
                     <!-- Form Actions -->
                     <div class="form-actions">
@@ -235,21 +418,7 @@ require_once __DIR__ . '/../includes/auth-check.php';
 
 </div>
 
-
 <script src="../assets/js/app.js"></script>
-
-<script>
-
-document.getElementById("vehicleForm").addEventListener("submit", function(event) {
-
-    event.preventDefault();
-
-    alert("Vehicle saved successfully! (Prototype)");
-
-});
-
-</script>
-
 
 </body>
 </html>
