@@ -110,7 +110,7 @@ require_once __DIR__ . '/page-context.php';
 
         <!-- Logout -->
         <a
-            href="#"
+            href="/vehicle-document-manager/auth/logout.php"
             class="sidebar-link logout-link"
         >
 
