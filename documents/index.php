@@ -1,3 +1,6 @@
+<?php
+require_once __DIR__ . '/../includes/auth-check.php';
+?>
 <?php include '../includes/header.php'; ?>
 
 <div class="app-container">
