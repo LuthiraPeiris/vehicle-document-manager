@@ -110,6 +110,14 @@ switch ($requestPath) {
 
         break;
 
+    /* Renewal History */
+    case 'documents/renewal_history.php':
+
+        $currentSection = 'renewal_history';
+        $pageTitle = 'Renewal History';
+
+        break;
+
 
     /* Profile */
     case 'profile':
