@@ -24,6 +24,10 @@ $query = $pdo->prepare(
         d.vehicle_id,
         d.previous_document_id,
         d.is_current,
+        d.file_path,
+        d.original_file_name,
+        d.file_mime_type,
+        d.file_size,
         v.registration_number,
         v.vehicle_type,
         v.make,
@@ -178,6 +182,11 @@ unset($document);
                     Document saved successfully.
                 </div>
             <?php endif; ?>
+            <?php if (isset($_GET['edited'])): ?>
+                <div class="alert alert-success" role="alert">
+                    Document updated successfully.
+                </div>
+            <?php endif; ?>
 
             <!-- Document Summary -->
             <div class="document-stats-grid">
@@ -289,6 +298,11 @@ unset($document);
 
                         <div
                             class="document-row document-item"
+                            data-edit-url="edit.php?id=<?= (int) $document['id'] ?>"
+                            role="link"
+                            tabindex="0"
+                            aria-label="Edit <?= htmlspecialchars($document['document_type']) ?>"
+                            style="cursor:pointer;"
                             data-type="<?= htmlspecialchars($document['type_key']) ?>"
                             data-status="<?= htmlspecialchars($document['status']) ?>"
                             data-search="<?= htmlspecialchars($searchText) ?>"
@@ -341,14 +355,39 @@ unset($document);
                                 </span>
                             </div>
 
-                            <a
-                                href="<?= htmlspecialchars($renewUrl) ?>"
-                                class="document-view-btn"
-                                aria-label="Renew <?= htmlspecialchars($document['document_type']) ?>"
-                                title="Renew document"
-                            >
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
+                            <div class="document-row-actions" style="display:flex;align-items:center;gap:10px;">
+                                <?php if (!empty($document['file_path'])): ?>
+                                    <a
+                                        href="file.php?id=<?= (int) $document['id'] ?>"
+                                        class="document-view-btn"
+                                        aria-label="View <?= htmlspecialchars($document['document_type']) ?>"
+                                        title="View document"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a
+                                        href="file.php?id=<?= (int) $document['id'] ?>&download=1"
+                                        class="document-view-btn"
+                                        aria-label="Download <?= htmlspecialchars($document['document_type']) ?>"
+                                        title="Download document"
+                                    >
+                                        <i class="bi bi-download"></i>
+                                    </a>
+                                <?php else: ?>
+                                    <span title="No file uploaded" style="color:var(--text-muted, #777);font-size:0.85rem;">No file</span>
+                                <?php endif; ?>
+
+                                <a
+                                    href="<?= htmlspecialchars($renewUrl) ?>"
+                                    class="document-view-btn"
+                                    aria-label="Renew <?= htmlspecialchars($document['document_type']) ?>"
+                                    title="Renew document"
+                                >
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </div>
 
                         </div>
 
@@ -437,6 +476,23 @@ function filterDocuments() {
 documentSearch.addEventListener('input', filterDocuments);
 documentTypeFilter.addEventListener('change', filterDocuments);
 documentStatusFilter.addEventListener('change', filterDocuments);
+
+// Clicking a document row opens its edit page, while action links keep their own behavior.
+documentItems.forEach(item => {
+    item.addEventListener('click', event => {
+        if (event.target.closest('a, button, input, select, textarea, label')) return;
+        const editUrl = item.dataset.editUrl;
+        if (editUrl) window.location.href = editUrl;
+    });
+    item.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            if (event.target.closest('a, button, input, select, textarea, label')) return;
+            event.preventDefault();
+            const editUrl = item.dataset.editUrl;
+            if (editUrl) window.location.href = editUrl;
+        }
+    });
+});
 </script>
 
 </body>

@@ -47,7 +47,11 @@ try {
             id,
             document_type,
             issue_date,
-            expiry_date
+            expiry_date,
+            file_path,
+            original_file_name,
+            file_mime_type,
+            file_size
          FROM documents
          WHERE vehicle_id = :vehicle_id
            AND user_id = :user_id
@@ -418,7 +422,32 @@ include __DIR__ . '/../includes/header.php';
 
                             </div>
 
-                            <div class="document-card-footer">
+                            <div class="document-card-footer" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+
+                                <?php if (!empty($document['file_path'])): ?>
+                                    <a
+                                        href="../documents/file.php?id=<?= (int) $document['id'] ?>"
+                                        class="document-action"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        <i class="bi bi-eye"></i>
+                                        View
+                                    </a>
+
+                                    <a
+                                        href="../documents/file.php?id=<?= (int) $document['id'] ?>&download=1"
+                                        class="document-action"
+                                    >
+                                        <i class="bi bi-download"></i>
+                                        Download
+                                    </a>
+                                <?php else: ?>
+                                    <span class="document-action" style="opacity:.65;cursor:default;">
+                                        <i class="bi bi-paperclip"></i>
+                                        No file uploaded
+                                    </span>
+                                <?php endif; ?>
 
                                 <a
                                     href="../documents/add.php?id=<?= (int) $document['id'] ?>&vehicle_id=<?= (int) $vehicle['id'] ?>"

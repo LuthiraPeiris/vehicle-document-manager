@@ -3,6 +3,7 @@
 
 require_once __DIR__ . '/../includes/auth-check.php';
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/storage.php';
 
 $userId = (int) $_SESSION['user_id'];
 
@@ -120,6 +121,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         && $postedDocumentId > 0
             ? $postedDocumentId
             : null;
+
+    /*
+     * Optional document upload. The extension and MIME type are both checked
+     * server-side; the browser's accept attribute is only a convenience.
+     */
+    $uploadedFile = null;
+    $newStoredFilePath = null;
+    $maxUploadBytes = 5 * 1024 * 1024;
+    $allowedMimeTypes = [
+        'application/pdf' => 'pdf',
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+    ];
+
+    if (isset($_FILES['document_file']) && is_array($_FILES['document_file'])) {
+        $file = $_FILES['document_file'];
+
+        if ($file['error'] !== UPLOAD_ERR_NO_FILE) {
+            if ($file['error'] !== UPLOAD_ERR_OK) {
+                $errors[] = $file['error'] === UPLOAD_ERR_INI_SIZE
+                    || $file['error'] === UPLOAD_ERR_FORM_SIZE
+                    ? 'The selected file is too large. Maximum size is 5 MB.'
+                    : 'The file could not be uploaded. Please try again.';
+            } elseif (!is_uploaded_file($file['tmp_name'])) {
+                $errors[] = 'The uploaded file could not be verified.';
+            } elseif ((int) $file['size'] <= 0 || (int) $file['size'] > $maxUploadBytes) {
+                $errors[] = 'Choose a file smaller than or equal to 5 MB.';
+            } else {
+                $finfo = new finfo(FILEINFO_MIME_TYPE);
+                $detectedMime = $finfo->file($file['tmp_name']);
+
+                if (!isset($allowedMimeTypes[$detectedMime])) {
+                    $errors[] = 'Only PDF, JPG, JPEG, and PNG files are allowed.';
+                } else {
+                    $originalName = basename((string) $file['name']);
+                    $uploadedFile = [
+                        'tmp_name' => $file['tmp_name'],
+                        'mime_type' => $detectedMime,
+                        'extension' => $allowedMimeTypes[$detectedMime],
+                        'original_name' => mb_substr($originalName, 0, 255),
+                        'size' => (int) $file['size'],
+                    ];
+                }
+            }
+        }
+    }
 
     if (
         !isset($_POST['csrf_token'])
@@ -299,9 +346,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     /*
      * Save a new document, or preserve history when renewing one.
+     * The old file remains attached to the old historical record.
      */
     if (empty($errors)) {
         try {
+            $fileMetadata = [
+                'file_path' => null,
+                'original_file_name' => null,
+                'file_mime_type' => null,
+                'file_size' => null,
+            ];
+
+            if ($uploadedFile !== null) {
+                if (!is_dir(DOCUMENT_STORAGE_PATH)
+                    && !mkdir(DOCUMENT_STORAGE_PATH, 0750, true)
+                    && !is_dir(DOCUMENT_STORAGE_PATH)
+                ) {
+                    throw new RuntimeException('Unable to prepare document storage.');
+                }
+
+                $storedName = bin2hex(random_bytes(24)) . '.' . $uploadedFile['extension'];
+                $absolutePath = DOCUMENT_STORAGE_PATH . DIRECTORY_SEPARATOR . $storedName;
+
+                if (!move_uploaded_file($uploadedFile['tmp_name'], $absolutePath)) {
+                    throw new RuntimeException('Unable to store uploaded document.');
+                }
+
+                $newStoredFilePath = $absolutePath;
+                $fileMetadata = [
+                    'file_path' => 'storage/' . $storedName,
+                    'original_file_name' => $uploadedFile['original_name'],
+                    'file_mime_type' => $uploadedFile['mime_type'],
+                    'file_size' => $uploadedFile['size'],
+                ];
+            } elseif ($renewingDocument) {
+                // If no replacement is uploaded, copy the existing file metadata
+                // to the new current record; the historical record keeps its own.
+                $fileMetadata = [
+                    'file_path' => $renewingDocument['file_path'] ?? null,
+                    'original_file_name' => $renewingDocument['original_file_name'] ?? null,
+                    'file_mime_type' => $renewingDocument['file_mime_type'] ?? null,
+                    'file_size' => $renewingDocument['file_size'] ?? null,
+                ];
+            }
+
             $pdo->beginTransaction();
 
             if ($renewingDocument) {
@@ -333,7 +421,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     issue_date,
                     expiry_date,
                     previous_document_id,
-                    is_current
+                    is_current,
+                    file_path,
+                    original_file_name,
+                    file_mime_type,
+                    file_size
                 ) VALUES (
                     :user_id,
                     :vehicle_id,
@@ -341,7 +433,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     :issue_date,
                     :expiry_date,
                     :previous_document_id,
-                    1
+                    1,
+                    :file_path,
+                    :original_file_name,
+                    :file_mime_type,
+                    :file_size
                 )'
             );
 
@@ -352,10 +448,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'issue_date' => $issueDate,
                 'expiry_date' => $expiryDate,
                 'previous_document_id' => $documentId,
+                'file_path' => $fileMetadata['file_path'],
+                'original_file_name' => $fileMetadata['original_file_name'],
+                'file_mime_type' => $fileMetadata['file_mime_type'],
+                'file_size' => $fileMetadata['file_size'],
             ]);
 
             $newDocumentId = (int) $pdo->lastInsertId();
-
             $pdo->commit();
 
             /*
@@ -376,6 +475,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (Throwable $e) {
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
+            }
+
+            // Avoid leaving an orphaned newly-uploaded file if saving fails.
+            if ($newStoredFilePath !== null && is_file($newStoredFilePath)) {
+                @unlink($newStoredFilePath);
             }
 
             error_log('Document save failed: ' . $e->getMessage());
@@ -465,7 +569,7 @@ $pageTitle = $isRenewal ? 'Renew Document' : 'Add Document';
 
                 </div>
 
-                <form id="documentForm" method="POST" action="">
+                <form id="documentForm" method="POST" action="" enctype="multipart/form-data">
 
                     <input
                         type="hidden"
@@ -610,6 +714,25 @@ $pageTitle = $isRenewal ? 'Renew Document' : 'Add Document';
 
                         </div>
 
+                    </div>
+
+                    <div class="form-group document-upload-group">
+                        <label for="document_file">Upload Document <small>(optional)</small></label>
+                        <input
+                            type="file"
+                            id="document_file"
+                            name="document_file"
+                            accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                        >
+                        <small>Allowed formats: PDF, JPG, JPEG, PNG. Maximum file size: 5 MB.</small>
+
+                        <?php if ($isRenewal && !empty($renewingDocument['original_file_name'])): ?>
+                            <p class="mt-2 mb-0">
+                                Current file:
+                                <strong><?= htmlspecialchars($renewingDocument['original_file_name']) ?></strong>
+                            </p>
+                            <small>Upload a new file to replace the attachment for this renewed record, or leave this field empty to keep the existing attachment.</small>
+                        <?php endif; ?>
                     </div>
 
                     <div class="document-form-notice">
