@@ -1,4 +1,4 @@
-```php
+
 <?php
 
 require_once __DIR__ . '/page-context.php';
@@ -94,4 +94,4 @@ require_once __DIR__ . '/page-context.php';
     </div>
 
 </aside>
-```
+

@@ -125,6 +125,12 @@ include __DIR__ . '/../includes/header.php';
 ?>
 
 <div class="auth-page">
+    <div class="auth-back-wrapper">
+    <a href="../index.php" class="auth-back-btn">
+        <i class="bi bi-arrow-left"></i>
+        <span>Back to Home</span>
+    </a>
+</div>
     <div class="auth-brand">
         <a href="../index.php" class="public-brand">
             <span class="public-brand-icon">

@@ -551,7 +551,7 @@ $pageTitle = $isRenewal ? 'Renew Document' : 'Add Document';
                 </div>
             <?php endif; ?>
 
-            <div class="form-card">
+            <div class="form-card document-form-card">
 
                 <div class="form-card-header">
 

@@ -193,7 +193,7 @@ include __DIR__ . '/../includes/header.php';
             </div>
 
             <!-- Form Card -->
-            <div class="form-card">
+            <div class="form-card vehicle-form-card">
 
                 <div class="form-card-header">
 
