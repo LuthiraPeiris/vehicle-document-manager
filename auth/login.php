@@ -201,7 +201,7 @@ if ($googleError === 'account_exists') {
                             Password
                         </label>
 
-                        <a href="#" id="forgotPasswordLink">
+                        <a href="forgot-password.php" id="forgotPasswordLink">
                             Forgot password?
                         </a>
 
@@ -312,11 +312,7 @@ passwordToggle.addEventListener("click", function () {
     );
 });
 
-// Password recovery is not implemented yet.
-document.getElementById("forgotPasswordLink")
-    .addEventListener("click", function (event) {
-        event.preventDefault();
-    });
+
 </script>
 
 </body>
