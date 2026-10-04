@@ -129,6 +129,18 @@ include __DIR__ . '/../includes/header.php';
                 </div>
             <?php endif; ?>
 
+            <?php
+$googleError = $_GET['google_error'] ?? '';
+
+if ($googleError === 'account_exists') {
+    $loginError = 'An account with this email already exists. Please sign in with your password first.';
+} elseif ($googleError === 'cancelled') {
+    $loginError = 'Google sign-in was cancelled.';
+} elseif ($googleError === 'failed') {
+    $loginError = 'Google sign-in failed. Please try again.';
+}
+?>
+
             <?php if ($loginError !== ''): ?>
                 <div class="alert alert-danger" role="alert">
                     <?= htmlspecialchars($loginError, ENT_QUOTES, 'UTF-8') ?>
@@ -232,6 +244,16 @@ include __DIR__ . '/../includes/header.php';
                 </button>
 
             </form>
+
+        
+            <div class="auth-divider">
+                <span>Or continue with</span>
+            </div>
+
+            <a href="../auth/google-start.php" class="auth-create-account">
+                <i class="bi bi-google"></i>
+                Continue with Google
+            </a>
 
             <div class="auth-divider">
                 <span>New to VehicleCare?</span>
