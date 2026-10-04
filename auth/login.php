@@ -66,6 +66,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Rotate the CSRF token after successful login.
                 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
+                if (isset($_POST['remember'])) {
+                    $token = bin2hex(random_bytes(32));
+                    $updateStmt = $pdo->prepare('UPDATE users SET remember_token = :token WHERE id = :id');
+                    $updateStmt->execute(['token' => $token, 'id' => $user['id']]);
+                    setcookie('remember_token', $token, time() + (30 * 24 * 60 * 60), '/', '', false, true);
+                }
+
                 // Redirect to the dashboard.
                 header('Location: ../dashboard.php');
                 exit;
@@ -233,6 +240,7 @@ if ($googleError === 'account_exists') {
                         <input
                             type="checkbox"
                             id="remember"
+                            name="remember"
                         >
 
                         <span>Remember me</span>

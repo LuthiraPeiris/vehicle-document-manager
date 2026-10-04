@@ -23,6 +23,12 @@ if (ini_get('session.use_cookies')) {
     );
 }
 
+if (isset($_COOKIE['remember_token'])) {
+    require_once __DIR__ . '/../config/database.php';
+    $stmt = $pdo->prepare('UPDATE users SET remember_token = NULL WHERE remember_token = :token');
+    $stmt->execute(['token' => $_COOKIE['remember_token']]);
+    setcookie('remember_token', '', time() - 3600, '/');
+}
 // Destroy the session.
 session_destroy();
 
