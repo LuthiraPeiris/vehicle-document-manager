@@ -5,6 +5,11 @@ require_once __DIR__ . '/page-context.php';
 // Get the logged-in user's name from the session.
 $userName = trim($_SESSION['user_name'] ?? 'Vehicle Owner');
 
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$notificationCsrfToken = $_SESSION['csrf_token'];
+
 // Generate initials from the user's name.
 $nameParts = preg_split('/\s+/', $userName);
 $initials = '';
@@ -46,14 +51,34 @@ if ($initials === '') {
 
     <div class="navbar-right">
 
-        <button
-            class="notification-btn"
-            type="button"
-            aria-label="Notifications"
-        >
-            <i class="bi bi-bell"></i>
-            <span class="notification-dot"></span>
-        </button>
+        <div class="notification-menu" id="notificationMenu" data-csrf="<?= htmlspecialchars($notificationCsrfToken, ENT_QUOTES, 'UTF-8') ?>">
+            <button
+                class="notification-btn"
+                id="notificationToggle"
+                type="button"
+                aria-label="Notifications"
+                aria-expanded="false"
+                aria-controls="notificationPanel"
+            >
+                <i class="bi bi-bell" aria-hidden="true"></i>
+                <span class="notification-badge" id="notificationBadge" hidden>0</span>
+            </button>
+            <section class="notification-panel" id="notificationPanel" aria-labelledby="notificationHeading" hidden>
+                <header class="notification-panel-header">
+                    <div>
+                        <h2 id="notificationHeading">Notifications</h2>
+                        <p>Updates about your documents</p>
+                    </div>
+                    <button class="notification-mark-all" id="markAllNotificationsRead" type="button">Mark all as read</button>
+                </header>
+                <p class="notification-feedback" id="notificationFeedback" role="status" hidden></p>
+                <div class="notification-list" id="notificationList"></div>
+                <div class="notification-empty" id="notificationEmpty" hidden>
+                    <i class="bi bi-bell-slash" aria-hidden="true"></i>
+                    <p>You’re all caught up.</p>
+                </div>
+            </section>
+        </div>
 
         <div class="user-menu">
 
@@ -80,3 +105,4 @@ if ($initials === '') {
     </div>
 
 </nav>
+<script src="/vehicle-document-manager/assets/js/notifications.js" defer></script>

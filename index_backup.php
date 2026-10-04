@@ -7,7 +7,7 @@
             <span class="public-brand-icon">
                 <i class="bi bi-car-front-fill" aria-hidden="true"></i>
             </span>
-            <span>Vehicle Documents Manager</span>
+            <span>Smart Vehicle Documents</span>
         </a>
 
         <div class="public-nav-actions">
@@ -21,7 +21,7 @@
         <div class="hero-content">
             <span class="hero-badge">
                 <i class="bi bi-shield-check" aria-hidden="true"></i>
-                Vehicle Document Management
+                Smart Vehicle Document Management
             </span>
 
             <h1>
@@ -39,17 +39,12 @@
                     Get Started
                     <i class="bi bi-arrow-right" aria-hidden="true"></i>
                 </a>
-
-                <a href="#features" class="hero-secondary-btn">
-                    Explore Features
-                </a>
+                <a href="#features" class="hero-secondary-btn">Explore Features</a>
             </div>
         </div>
 
-        <!-- Hero vehicle image -->
+        <!-- Hero vehicle image. Save the supplied car image at this path. -->
         <div class="hero-preview">
-            <span class="hero-glow" aria-hidden="true"></span>
-
             <img
                 class="hero-car-image"
                 src="assets/images/vehicle-hero.png"
@@ -64,75 +59,37 @@
     <section class="features-section" id="features">
         <div class="section-intro">
             <span class="section-eyebrow">WHAT YOU CAN DO</span>
-
-            <h2>
-                All your important vehicle documents in one place.
-            </h2>
-
+            <h2>Everything you need to manage your vehicle documents.</h2>
             <p>
-                Manage your documents, monitor expiry dates, and stay
-                prepared for renewals without the hassle of paperwork.
+                A simple way to keep track of important documents and
+                upcoming renewals.
             </p>
         </div>
 
         <div class="feature-grid">
-
-            <!-- Driving License -->
             <div class="feature-card">
                 <div class="feature-icon blue">
-                    <i class="bi bi-person-vcard" aria-hidden="true"></i>
+                    <i class="bi bi-car-front-fill" aria-hidden="true"></i>
                 </div>
-
-                <h3>Driving License</h3>
-
-                <p>
-                    Keep your driving license details organized and
-                    track its expiry date so you can renew it on time.
-                </p>
+                <h3>Manage Vehicles</h3>
+                <p>Keep information about your vehicles organized in one place.</p>
             </div>
 
-            <!-- Revenue License -->
             <div class="feature-card">
                 <div class="feature-icon purple">
-                    <i class="bi bi-file-earmark-check" aria-hidden="true"></i>
+                    <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
                 </div>
-
-                <h3>Revenue License</h3>
-
-                <p>
-                    Record your vehicle's revenue license details
-                    and stay informed about upcoming renewals.
-                </p>
+                <h3>Track Documents</h3>
+                <p>Keep track of important vehicle documents and their expiry dates.</p>
             </div>
 
-            <!-- Vehicle Insurance -->
             <div class="feature-card">
                 <div class="feature-icon orange">
-                    <i class="bi bi-shield-check" aria-hidden="true"></i>
+                    <i class="bi bi-bell" aria-hidden="true"></i>
                 </div>
-
-                <h3>Vehicle Insurance</h3>
-
-                <p>
-                    Keep your insurance information accessible
-                    and track policy expiry dates before they arrive.
-                </p>
+                <h3>Stay Ahead</h3>
+                <p>Get reminders when important vehicle documents are approaching expiry.</p>
             </div>
-
-            <!-- Emission Test Certificate -->
-            <div class="feature-card">
-                <div class="feature-icon blue">
-                    <i class="bi bi-cloud-check" aria-hidden="true"></i>
-                </div>
-
-                <h3>Emission Test Certificate</h3>
-
-                <p>
-                    Store your emission test certificate details
-                    and keep track of when your next test is due.
-                </p>
-            </div>
-
         </div>
     </section>
 
@@ -140,11 +97,8 @@
     <section class="cta-section">
         <div>
             <h2>Keep your vehicle documents under control.</h2>
-            <p>
-                Start organizing your vehicle information today.
-            </p>
+            <p>Start organizing your vehicle information today.</p>
         </div>
-
         <a href="auth/register.php" class="cta-button">
             Create an Account
             <i class="bi bi-arrow-right" aria-hidden="true"></i>
@@ -153,11 +107,8 @@
 
     <!-- Footer -->
     <footer class="public-footer">
-        <span>
-            © <?php echo date('Y'); ?> Vehicle Document Management
-        </span>
-
-        <span>Vehicle Document Management</span>
+        <span>© <?php echo date('Y'); ?> Smart Vehicle Document Management</span>
+        <span>Smart Vehicle Document Management</span>
     </footer>
 </div>
 

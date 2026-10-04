@@ -66,7 +66,7 @@ try {
         <div class="content-wrapper">
             <div class="welcome-section">
                 <div>
-                    <h1><?= dashboard_escape($greeting) ?>, <?= dashboard_escape($userName) ?> 👋</h1>
+                    <h1><?= dashboard_escape($greeting) ?>, <?= dashboard_escape($userName) ?></h1>
                     <p>Here's an overview of your vehicles and upcoming document renewals.</p>
                 </div>
                 <a href="vehicles/add.php" class="btn btn-primary add-vehicle-btn">
@@ -145,9 +145,11 @@ try {
                                         <span><?= dashboard_escape($vehicleLabel) ?></span>
                                     </div>
                                     <div class="renewal-status <?= $daysRemaining <= 7 ? 'warning' : 'normal' ?>">
-                                        <strong><?= $daysRemaining === 0 ? 'Today' : $daysRemaining . ' day' . ($daysRemaining === 1 ? '' : 's') ?></strong>
-                                        <span><?= $daysRemaining === 0 ? 'expires' : 'remaining' ?></span>
-                                    </div>
+    <span class="renewal-days">
+        <?= $daysRemaining === 0 ? 'Today' : $daysRemaining . ' day' . ($daysRemaining === 1 ? '' : 's') ?>
+        <?= $daysRemaining === 0 ? 'expires' : 'remaining' ?>
+    </span>
+</div>
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>

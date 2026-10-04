@@ -1,310 +1,798 @@
 /* =========================================================
-   DASHBOARD STAT CARDS
+   VEHICLECARE DASHBOARD
+   Theme: Navy + Blue + Mint
 ========================================================= */
+
+/* ---------- Dashboard Statistics ---------- */
 
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 16px;
-    margin-bottom: 20px;
+    gap: 20px;
+    margin-bottom: 28px;
 }
 
 .stat-card {
-    min-height: 102px;
-    padding: 18px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    background: var(--surface);
-    box-shadow: var(--shadow-sm);
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 17px;
+    min-width: 0;
+    padding: 25px 23px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #e9edf6;
+    border-radius: 22px;
+    box-shadow: 0 8px 28px rgba(11, 16, 34, 0.035);
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    border-color: #dce4ff;
+    box-shadow: 0 16px 35px rgba(11, 16, 34, 0.075);
 }
 
 .stat-icon {
+    display: flex;
+    flex: 0 0 46px;
+    align-items: center;
+    justify-content: center;
     width: 46px;
     height: 46px;
-    flex: 0 0 46px;
-    display: grid;
-    place-items: center;
-    border-radius: 11px;
-    font-size: 19px;
+    font-size: 20px;
+    border-radius: 10px;
 }
 
 .stat-icon.blue {
-    background: #dbeafe;
-    color: var(--primary);
+    color: #2f5bff;
+    background: #edf1ff;
+    --stat-glow: rgba(47, 91, 255, 0.07);
 }
 
 .stat-icon.orange {
-    background: var(--warning-soft);
-    color: var(--warning);
+    color: #d97706;
+    background: #fff4df;
+    --stat-glow: rgba(245, 158, 11, 0.08);
 }
 
 .stat-icon.red {
-    background: var(--danger-soft);
-    color: var(--danger);
+    color: #e5485d;
+    background: #fff0f1;
+    --stat-glow: rgba(229, 72, 93, 0.08);
 }
 
 .stat-icon.green {
-    background: var(--success-soft);
-    color: var(--success);
+    color: #059669;
+    background: #e6fbf3;
+    --stat-glow: rgba(5, 150, 105, 0.08);
 }
 
-.stat-content span {
-    display: block;
-    margin-bottom: 3px;
-    color: var(--text-muted);
-    font-size: 11.5px;
-    font-weight: 500;
+.stat-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
 }
 
-.stat-content h2 {
+.stat-content h3 {
     margin: 0;
-    color: var(--text);
-    font-size: 24px;
-    line-height: 1;
-    font-weight: 760;
+    color: #64708a;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.1px;
+}
+
+.stat-content p {
+    margin: 0;
+    color: #0b1022;
+    font-size: clamp(25px, 2vw, 32px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1.2px;
+    overflow-wrap: anywhere;
 }
 
 
-/* =========================================================
-   DASHBOARD CARDS
-========================================================= */
+/* ---------- Main Dashboard Grid ---------- */
 
 .dashboard-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.7fr) minmax(300px, 0.95fr);
-    gap: 18px;
-    margin-bottom: 18px;
+    grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.85fr);
+    align-items: stretch;
+    gap: 24px;
+    margin-bottom: 28px;
 }
 
 .dashboard-card {
-    overflow: hidden;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    background: var(--surface);
-    box-shadow: var(--shadow-sm);
+    min-width: 0;
+    padding: 25px;
+    background: #ffffff;
+    border: 1px solid #e9edf6;
+    border-radius: 24px;
+    box-shadow: 0 8px 28px rgba(11, 16, 34, 0.035);
 }
 
+.renewals-card,
+.status-card,
+.vehicles-card {
+    overflow: hidden;
+}
+
+
+/* ---------- Card Headers ---------- */
+
 .card-header {
-    min-height: 72px;
-    padding: 17px 20px;
-    border-bottom: 1px solid var(--border-light);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 15px;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding: 0;
+    background: transparent;
+    border: none;
 }
 
-.card-header h3 {
-    margin: 0 0 3px;
-    color: var(--text);
-    font-size: 14px;
-    line-height: 1.25;
-    font-weight: 700;
-}
-
-.card-header p {
+.card-header h2 {
     margin: 0;
-    color: var(--text-muted);
-    font-size: 11px;
+    color: #0b1022;
+    font-size: 17px;
+    font-weight: 750;
+    line-height: 1.4;
+    letter-spacing: -0.35px;
+}
+
+.renewals-card .card-header h3,
+.status-card .card-header h3,
+.vehicles-card .card-header h3 {
+    margin: 0;
+    color: #0b1022;
+    font-size: 17px;
+    font-weight: 750;
+    line-height: 1.4;
+    letter-spacing: -0.35px;
+}
+
+.renewals-card .card-header p,
+.status-card .card-header p,
+.vehicles-card .card-header p {
+    margin: 5px 0 0;
+    color: #778199;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
 }
 
 .view-all {
-    color: var(--primary);
-    font-size: 11px;
-    font-weight: 650;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 6px;
+    color: #2f5bff;
+    font-size: 12px;
+    font-weight: 700;
     text-decoration: none;
+    transition: color 0.2s ease;
 }
 
 .view-all:hover {
-    text-decoration: underline;
+    color: #1738c5;
+}
+
+.view-all i {
+    font-size: 13px;
+    transition: transform 0.2s ease;
+}
+
+.view-all:hover i {
+    transform: translateX(3px);
 }
 
 
-/* =========================================================
-   UPCOMING RENEWALS
-========================================================= */
+/* ---------- Upcoming Renewals ---------- */
+
+.renewals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
 
 .renewal-item {
     display: flex;
     align-items: center;
-    gap: 13px;
-    min-height: 74px;
-    padding: 12px 20px;
-    border-bottom: 1px solid var(--border-light);
+    gap: 14px;
+    min-width: 0;
+    padding: 16px;
+    background: #f8faff;
+    border: 1px solid #e7ecf8;
+    border-left: 3px solid #2f5bff;
+    border-radius: 12px;
+    transition: background 0.2s ease, border-color 0.2s ease;
 }
 
-.renewal-item:last-child {
-    border-bottom: 0;
+.renewal-item:hover {
+    background: #f0f4ff;
+    border-color: #d5dfff;
+    border-left-color: #2f5bff;
 }
 
 .document-icon {
-    width: 40px;
-    height: 40px;
-    flex: 0 0 40px;
-    display: grid;
-    place-items: center;
-    border-radius: 10px;
-    font-size: 17px;
-}
-
-.document-icon.insurance {
-    background: #ede9fe;
-    color: #7c3aed;
-}
-
-.document-icon.license {
-    background: #dbeafe;
-    color: var(--primary);
-}
-
-.document-icon.emission {
-    background: var(--success-soft);
-    color: var(--success);
+    display: flex;
+    flex: 0 0 44px;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    color: #2f5bff;
+    font-size: 19px;
+    background: #edf1ff;
+    border: 1px solid #dfe6ff;
+    border-radius: 12px;
 }
 
 .renewal-info {
+    display: flex;
     flex: 1;
+    flex-direction: column;
+    gap: 5px;
     min-width: 0;
 }
 
 .renewal-info h4 {
-    margin: 0 0 2px;
-    color: var(--text);
-    font-size: 12.5px;
-    font-weight: 650;
+    margin: 0;
+    color: #0b1022;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.5;
 }
 
-.renewal-info span {
-    display: block;
-    overflow: hidden;
-    color: var(--text-muted);
-    font-size: 10.5px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.renewal-info p {
+    margin: 4px 0 0;
+    color: #64708a;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.5;
 }
 
 .renewal-status {
-    min-width: 62px;
-    text-align: right;
-    display: flex;
-    flex-direction: column;
-}
-
-.renewal-status strong {
-    font-size: 12.5px;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    max-width: 125px;
+    padding: 7px 11px;
+    color: #b45309;
+    font-size: 10px;
     font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+    background: #fff4df;
+    border: 1px solid #ffe5b0;
+    border-radius: 8px;
 }
 
-.renewal-status span {
-    margin-top: 1px;
-    color: var(--text-light);
-    font-size: 9.5px;
+/* Support common status classes if they are used in the markup. */
+
+.renewal-status.expired,
+.renewal-status.danger {
+    color: #c9364b;
+    background: #fff0f1;
+    border-color: #ffdadd;
 }
 
-.renewal-status.warning strong {
-    color: var(--warning);
+.renewal-status.valid,
+.renewal-status.success {
+    color: #047857;
+    background: #e7fbf2;
+    border-color: #c8f5e2;
 }
 
-.renewal-status.normal strong {
-    color: var(--success);
+.renewal-status.warning,
+.renewal-status.expiring {
+    color: #b45309;
+    background: #fff3dc;
+    border-color: #ffebbd;
 }
 
 
-/* =========================================================
-   DOCUMENT STATUS
-========================================================= */
+/* ---------- Document Status ---------- */
 
-.status-content {
-    min-height: 236px;
-    padding: 22px;
+.status-card .card-header {
+    margin-bottom: 20px;
+}
+
+
+
+.status-card .status-content {
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr);
+    align-items: center;
+    gap: 22px;
+    padding: 2px 0;
+}
+
+.status-card .status-circle {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 28px;
-}
-
-.status-circle {
-    width: 128px;
-    height: 128px;
-    flex: 0 0 128px;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    background:
-        radial-gradient(circle at center, #fff 52%, transparent 53%),
-        conic-gradient(
-            #16a34a 0deg 225deg,
-            #f59e0b 225deg 315deg,
-            #dc2626 315deg 360deg
-        );
-    text-align: center;
-}
-
-.status-circle > div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.status-circle strong {
-    font-size: 26px;
-    line-height: 1;
-}
-
-.status-circle span {
-    margin-top: 4px;
-    color: var(--text-muted);
-    font-size: 10px;
-}
-
-.status-legend {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-}
-
-.legend-dot {
-    width: 8px;
-    height: 8px;
-    flex: 0 0 8px;
+    width: 112px;
+    height: 112px;
+    flex-shrink: 0;
+    background: #f4f6fc;
+    border: 1px solid #e5eaf5;
     border-radius: 50%;
 }
 
-.legend-dot.green {
-    background: var(--success);
+.status-card .status-circle::before {
+    content: none;
 }
 
-.legend-dot.orange {
-    background: var(--warning);
-}
-
-.legend-dot.red {
-    background: var(--danger);
-}
-
-.legend-item div {
+.status-card .status-circle > div {
     display: flex;
-    align-items: baseline;
+    flex-direction: column;
+    align-items: center;
     gap: 5px;
 }
 
-.legend-item strong {
-    color: var(--text);
+.status-card .status-circle strong {
+    color: #0b1022;
+    font-size: 30px;
+    font-weight: 750;
+    line-height: 1;
+    letter-spacing: -1px;
+    font-variant-numeric: tabular-nums;
+}
+
+.status-card .status-circle span {
+    color: #778199;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.status-card .status-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+}
+
+.status-card .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 12px 0;
+    color: #64708a;
     font-size: 12px;
+    font-weight: 600;
 }
 
-.legend-item div span {
-    color: var(--text-muted);
-    font-size: 10.5px;
+.status-card .legend-item + .legend-item {
+    border-top: 1px solid #edf0f7;
+}
+
+.status-card .legend-item > div {
+    display: flex;
+    flex: 1;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
+}
+
+.status-card .legend-item strong {
+    color: #0b1022;
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.status-card .legend-item div span {
+    color: #64708a;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.status-card .legend-dot {
+    display: inline-block;
+    flex: 0 0 9px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+}
+
+.status-card .legend-dot.green {
+    background: #7cf2d0;
+    box-shadow: inset 0 0 0 1px #25b98b;
+}
+
+.status-card .legend-dot.red {
+    background: #e5485d;
+}
+
+.status-card .legend-dot.orange {
+    background: #f59e0b;
+}
+/* ---------- My Vehicles Table Card ---------- */
+
+.vehicles-card {
+    margin-bottom: 28px;
+}
+
+.vehicles-card .card-header {
+    margin-bottom: 20px;
+}
+
+.vehicles-card table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.vehicles-card thead th {
+    padding: 14px 16px;
+    color: #7b859b;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.7px;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+    background: #f7f8fc;
+    border-top: 1px solid #edf0f7;
+    border-bottom: 1px solid #edf0f7;
+}
+
+.vehicles-card thead th:first-child {
+    border-radius: 12px 0 0 12px;
+}
+
+.vehicles-card thead th:last-child {
+    border-radius: 0 12px 12px 0;
+}
+
+.vehicles-card tbody td {
+    padding: 17px 16px;
+    color: #536079;
+    font-size: 12px;
+    font-weight: 500;
+    vertical-align: middle;
+    border-bottom: 1px solid #edf0f7;
+}
+
+.vehicles-card tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.vehicles-card .vehicle-row:not(.vehicle-header) {
+    transition: background-color 180ms ease;
+}
+
+.vehicles-card .vehicle-row:not(.vehicle-header):hover {
+    background-color: #fafbff;
+}
+
+.vehicles-card tbody td:first-child {
+    color: #17203a;
+    font-weight: 700;
+}
+
+.vehicles-card a {
+    color: #2f5bff;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.vehicles-card a:hover {
+    color: #1738c5;
 }
 
 
+/* ---------- Empty States ---------- */
+
+.dashboard-card .empty-state,
+.renewals-list .empty-state,
+.vehicles-card .empty-state {
+    padding: 30px 18px;
+    color: #778199;
+    font-size: 13px;
+    line-height: 1.7;
+    text-align: center;
+}
+
+.empty-state i {
+    display: block;
+    margin-bottom: 12px;
+    color: #9ba9c8;
+    font-size: 30px;
+}
+
+.empty-state p {
+    margin: 0;
+}
+
+
+/* ---------- Scroll Handling ---------- */
+
+.vehicles-card .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.vehicles-card table {
+    min-width: 540px;
+}
+
+
+/* ---------- Tablet ---------- */
+
+@media (max-width: 1200px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+    }
+
+
+
+}
+
+
+/* ---------- Small Tablet ---------- */
+
+@media (max-width: 768px) {
+    .stats-grid {
+        gap: 14px;
+        margin-bottom: 22px;
+    }
+
+    .stat-card {
+        gap: 13px;
+        padding: 20px 17px;
+        border-radius: 19px;
+    }
+
+    .stat-icon {
+        flex-basis: 46px;
+        width: 46px;
+        height: 46px;
+        font-size: 20px;
+        border-radius: 14px;
+    }
+
+    .stat-content h3 {
+        font-size: 11px;
+    }
+
+    .stat-content p {
+        font-size: 27px;
+    }
+
+    .dashboard-card {
+        padding: 21px;
+        border-radius: 21px;
+    }
+
+    .card-header {
+        margin-bottom: 19px;
+    }
+
+
+
+}
+
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 550px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 11px;
+    }
+
+    .stat-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 17px 15px;
+        border-radius: 17px;
+    }
+
+    .stat-icon {
+        flex-basis: 42px;
+        width: 42px;
+        height: 42px;
+        font-size: 19px;
+        border-radius: 13px;
+    }
+
+    .stat-content {
+        gap: 6px;
+    }
+
+    .stat-content h3 {
+        font-size: 10px;
+        line-height: 1.5;
+    }
+
+    .stat-content p {
+        font-size: 25px;
+    }
+
+    .dashboard-grid {
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .dashboard-card {
+        padding: 18px 15px;
+        border-radius: 19px;
+    }
+
+    .card-header {
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 17px;
+    }
+
+.card-header h2 {
+    margin: 0;
+    color: #0b1022;
+    font-size: 17px;
+    font-weight: 750;
+    line-height: 1.4;
+    letter-spacing: -0.35px;
+}
+
+    .view-all {
+        gap: 4px;
+        font-size: 11px;
+    }
+
+.renewals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+    .renewal-item {
+        gap: 10px;
+        padding: 12px 10px;
+        border-radius: 14px;
+    }
+
+    .document-icon {
+        flex-basis: 38px;
+        width: 38px;
+        height: 38px;
+        font-size: 17px;
+        border-radius: 12px;
+    }
+
+    .renewal-info h4 {
+        font-size: 12px;
+    }
+
+    .renewal-info p {
+        font-size: 10px;
+    }
+
+.renewal-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 125px;
+    text-align: center;
+}
+
+.renewal-status strong {
+    display: block;
+    white-space: nowrap;
+}
+
+.renewal-status span {
+    display: block;
+    margin-top: 0;
+    white-space: nowrap;
+}
+
+    .status-card .status-content {
+        grid-template-columns: 88px minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .status-card .status-circle {
+        width: 88px;
+        height: 88px;
+    }
+
+    .status-card .status-circle strong {
+        font-size: 25px;
+    }
+
+    .status-card .legend-item {
+        gap: 8px;
+        padding: 11px 0;
+    }
+
+    .vehicles-card {
+        margin-bottom: 20px;
+    }
+
+    .vehicles-card thead th,
+    .vehicles-card tbody td {
+        padding: 13px 12px;
+    }
+}
+
+
+/* ---------- Very Small Mobile ---------- */
+
+@media (max-width: 360px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        flex-direction: row;
+        align-items: center;
+        padding: 16px;
+    }
+
+    .renewal-item {
+        flex-wrap: wrap;
+    }
+
+    .renewal-status {
+        margin-left: 48px;
+    }
+}
+
+
+/* ---------- Reduced Motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+    .stat-card,
+    .renewal-item,
+    .view-all i {
+        transition: none;
+    }
+
+    .stat-card:hover,
+    .renewal-item:hover,
+    .view-all:hover i {
+        transform: none;
+    }
+}
+
+/* Fix spacing between upcoming renewal rows */
+.renewal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.renewal-list .renewal-item {
+    margin: 0;
+}
+
+.renewal-status .renewal-days {
+    display: inline-block;
+    white-space: nowrap;
+    word-spacing: 2px;
+}

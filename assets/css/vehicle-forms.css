@@ -209,6 +209,144 @@
     background: var(--primary-dark);
 }
 
+/* Shared Vehicle and Document form refinement */
+
+.vehicle-form-card,
+.document-form-card {
+    background: #ffffff;
+    border-color: #d8e0ed;
+    box-shadow: var(--shadow-md);
+}
+
+.vehicle-form-card .form-card-header,
+.document-form-card .form-card-header {
+    background: #fbfcff;
+    border-bottom-color: #e2e8f0;
+}
+
+.vehicle-form-card .form-card-header h2,
+.document-form-card .form-card-header h2 {
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 750;
+    line-height: 1.35;
+}
+
+.vehicle-form-card .form-card-header p,
+.document-form-card .form-card-header p {
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.vehicle-form-card .form-group label,
+.document-form-card .form-group label {
+    color: #17233b;
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+.vehicle-form-card .form-group input,
+.document-form-card .form-group input,
+.vehicle-form-card .form-group select,
+.document-form-card .form-group select {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
+    font-size: 13px;
+}
+
+.vehicle-form-card .form-group input::placeholder,
+.document-form-card .form-group input::placeholder {
+    color: #64748b;
+    opacity: 1;
+}
+
+.vehicle-form-card .form-group input:focus,
+.document-form-card .form-group input:focus,
+.vehicle-form-card .form-group select:focus,
+.document-form-card .form-group select:focus {
+    background: #ffffff;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.vehicle-form-card .form-group small,
+.document-form-card .form-group small {
+    color: #64748b;
+    font-size: 11px;
+}
+
+.vehicle-form-card .btn-save,
+.document-form-card .btn-save {
+    font-size: 12.5px;
+    font-weight: 700;
+    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.2);
+    transition: background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.vehicle-form-card .btn-save:hover,
+.document-form-card .btn-save:hover {
+    box-shadow: 0 7px 17px rgba(37, 99, 235, 0.25);
+}
+
+.vehicle-form-card .btn-save:focus-visible,
+.document-form-card .btn-save:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.3);
+    outline-offset: 2px;
+}
+
+.document-form-card .document-upload-group {
+    gap: 9px;
+    margin-top: 18px;
+    padding: 16px;
+    border: 1px dashed #b8c4d6;
+    border-radius: 12px;
+    background: #fbfcff;
+}
+
+.document-form-card .document-upload-group label {
+    margin: 0;
+}
+
+.document-form-card .document-upload-group label > small {
+    margin: 0 0 0 4px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.document-form-card .document-upload-group input[type="file"] {
+    min-height: 48px;
+    padding: 7px;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.document-form-card .document-upload-group input[type="file"]::file-selector-button {
+    margin-right: 10px;
+    padding: 6px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #f1f5f9;
+    color: #17233b;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.document-form-card .document-upload-group > small {
+    margin-top: 0;
+    color: #64748b;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.document-form-card .document-upload-group input[type="file"]:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.3);
+    outline-offset: 2px;
+}
+
 @media (max-width: 700px) {
     .form-grid {
         grid-template-columns: 1fr;

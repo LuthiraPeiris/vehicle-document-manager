@@ -106,7 +106,7 @@ function history_h($value): string
 
         <?php include __DIR__ . '/../includes/navbar.php'; ?>
 
-        <div class="content-wrapper">
+        <div class="content-wrapper history-page">
 
             <!-- Page Header -->
             <div class="page-header">
