@@ -1,0 +1,97 @@
+/* =========================================================
+   PUBLIC/AUTH RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .hero-section {
+        grid-template-columns: 1fr;
+        padding-top: 50px;
+        gap: 50px;
+    }
+
+    .hero-content {
+        max-width: 650px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .hero-actions,
+    .hero-note {
+        justify-content: center;
+    }
+
+    .hero-preview {
+        max-width: 700px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 650px) {
+
+    .public-navbar {
+        padding: 0 18px;
+    }
+
+    .hero-section {
+        padding: 45px 18px 65px;
+    }
+
+    .hero-content h1 {
+        font-size: 39px;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hero-primary-btn,
+    .hero-secondary-btn {
+        width: 100%;
+    }
+
+    .features-section {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .cta-section {
+        margin-left: 18px;
+        margin-right: 18px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .public-footer {
+        flex-direction: column;
+        gap: 5px;
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .auth-page {
+        padding: 20px 15px 30px;
+    }
+
+    .auth-card {
+        padding: 22px 18px;
+    }
+
+    .auth-form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .auth-brand {
+        margin-bottom: 20px;
+    }
+
+}
+
