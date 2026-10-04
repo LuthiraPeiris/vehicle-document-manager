@@ -75,7 +75,7 @@ require_once __DIR__ . '/page-context.php';
 
         <!-- Profile -->
         <a
-            href="#"
+            href="/vehicle-document-manager/profile.php"
             class="sidebar-link <?= $currentSection === 'profile' ? 'active' : '' ?>"
         >
             <i class="bi bi-person-circle"></i>
