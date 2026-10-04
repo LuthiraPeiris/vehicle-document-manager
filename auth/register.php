@@ -1,28 +1,27 @@
-
 <?php
-
 session_start();
 
 require_once __DIR__ . '/../config/database.php';
 
 // Form values
+
 $fullName = '';
 $email = '';
 $phoneNumber = '';
 $errors = [];
 
 // Process registration
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fullName = trim($_POST['full_name'] ?? '');
     $email = strtolower(trim($_POST['email'] ?? ''));
     $phoneNumber = trim($_POST['phone_number'] ?? '');
-
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
     $csrfToken = $_POST['csrf_token'] ?? '';
 
     // Validate CSRF token
+
     if (
         !isset($_SESSION['csrf_token']) ||
         !is_string($csrfToken) ||
@@ -61,7 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Create account
     if (empty($errors)) {
-
         try {
             // Check whether the email already exists
             $checkEmail = $pdo->prepare(
@@ -73,11 +71,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
 
             if ($checkEmail->fetch()) {
-
                 $errors[] = 'An account with this email already exists.';
 
             } else {
-
                 // Hash the password before storing it
                 $passwordHash = password_hash(
                     $password,
@@ -108,11 +104,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header('Location: login.php?registered=1');
                 exit;
             }
-
         } catch (PDOException $e) {
-
             error_log('Registration error: ' . $e->getMessage());
-
             // A concurrent registration may have used the same email
             if ($e->getCode() === '23000') {
                 $errors[] = 'An account with this email already exists.';
@@ -129,45 +122,31 @@ if (empty($_SESSION['csrf_token'])) {
 }
 
 include __DIR__ . '/../includes/header.php';
-
 ?>
 
 <div class="auth-page">
-
     <div class="auth-brand">
-
         <a href="../index.php" class="public-brand">
-
             <span class="public-brand-icon">
                 <i class="bi bi-car-front-fill"></i>
             </span>
-
             <span>VehicleCare</span>
-
         </a>
-
     </div>
 
     <div class="auth-container">
-
         <div class="auth-card register-card">
-
             <div class="auth-header">
-
                 <div class="auth-icon">
                     <i class="bi bi-person-plus"></i>
                 </div>
-
                 <h1>Create your account</h1>
-
                 <p>
                     Start managing your vehicle documents in one place.
                 </p>
-
             </div>
 
             <?php if (!empty($errors)): ?>
-
                 <div class="alert alert-danger" role="alert">
                     <ul class="mb-0">
                         <?php foreach ($errors as $error): ?>
@@ -185,7 +164,6 @@ include __DIR__ . '/../includes/header.php';
             <?php endif; ?>
 
             <form id="registerForm" method="POST" action="">
-
                 <input
                     type="hidden"
                     name="csrf_token"
@@ -195,17 +173,12 @@ include __DIR__ . '/../includes/header.php';
                         'UTF-8'
                     ) ?>"
                 >
-
                 <div class="auth-form-group">
-
                     <label for="name">
                         Full Name
                     </label>
-
                     <div class="auth-input-wrapper">
-
                         <i class="bi bi-person"></i>
-
                         <input
                             type="text"
                             id="name"
@@ -220,21 +193,14 @@ include __DIR__ . '/../includes/header.php';
                             autocomplete="name"
                             required
                         >
-
                     </div>
-
                 </div>
-
                 <div class="auth-form-group">
-
                     <label for="registerEmail">
                         Email Address
                     </label>
-
                     <div class="auth-input-wrapper">
-
                         <i class="bi bi-envelope"></i>
-
                         <input
                             type="email"
                             id="registerEmail"
@@ -249,21 +215,14 @@ include __DIR__ . '/../includes/header.php';
                             autocomplete="email"
                             required
                         >
-
                     </div>
-
                 </div>
-
                 <div class="auth-form-group">
-
                     <label for="phone">
                         Phone Number
                     </label>
-
                     <div class="auth-input-wrapper">
-
                         <i class="bi bi-telephone"></i>
-
                         <input
                             type="tel"
                             id="phone"
@@ -277,23 +236,15 @@ include __DIR__ . '/../includes/header.php';
                             maxlength="30"
                             autocomplete="tel"
                         >
-
                     </div>
-
                 </div>
-
                 <div class="auth-form-row">
-
                     <div class="auth-form-group">
-
                         <label for="registerPassword">
                             Password
                         </label>
-
                         <div class="auth-input-wrapper">
-
                             <i class="bi bi-lock"></i>
-
                             <input
                                 type="password"
                                 id="registerPassword"
@@ -303,21 +254,14 @@ include __DIR__ . '/../includes/header.php';
                                 autocomplete="new-password"
                                 required
                             >
-
                         </div>
-
                     </div>
-
                     <div class="auth-form-group">
-
                         <label for="confirmPassword">
                             Confirm Password
                         </label>
-
                         <div class="auth-input-wrapper">
-
                             <i class="bi bi-lock"></i>
-
                             <input
                                 type="password"
                                 id="confirmPassword"
@@ -327,24 +271,16 @@ include __DIR__ . '/../includes/header.php';
                                 autocomplete="new-password"
                                 required
                             >
-
                         </div>
-
                     </div>
-
                 </div>
-
                 <div class="password-requirement">
-
                     <i class="bi bi-info-circle"></i>
-
                     <span>
                         Use a strong password with a combination of
                         letters, numbers, and symbols.
                     </span>
-
                 </div>
-
                 <button
                     type="submit"
                     class="auth-submit-btn"
@@ -352,45 +288,41 @@ include __DIR__ . '/../includes/header.php';
                     Create Account
                     <i class="bi bi-arrow-right"></i>
                 </button>
-
             </form>
+            <div class="auth-divider">
+                <span>Or sign up with</span>
+            </div>
 
+            <a href="google-start.php" class="auth-create-account">
+                <i class="bi bi-google"></i>
+                Continue with Google
+            </a>
             <div class="auth-divider">
                 <span>Already have an account?</span>
             </div>
-
             <a
                 href="login.php"
                 class="auth-create-account"
             >
                 Sign in instead
             </a>
-
         </div>
-
         <p class="auth-footer-text">
             Your information will be securely stored in the VehicleCare system.
         </p>
-
     </div>
-
 </div>
-
 <script src="../assets/js/app.js"></script>
-
 <script>
-document.getElementById("registerForm").addEventListener("submit", function (event) {
 
+document.getElementById("registerForm").addEventListener("submit", function (event) {
     const password = document.getElementById("registerPassword").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
-
     if (password !== confirmPassword) {
         event.preventDefault();
         alert("Passwords do not match.");
     }
-
 });
 </script>
-
 </body>
 </html>
