@@ -167,7 +167,12 @@
 
 .hero-content h1 span {
     display: block;
+    white-space: nowrap;
     color: var(--vd-mint);
+}
+
+.hero-content h1 .hero-heading-line {
+    color: #fff;
 }
 
 .hero-content > p {
