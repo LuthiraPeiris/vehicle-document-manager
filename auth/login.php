@@ -283,7 +283,7 @@ if ($googleError === 'account_exists') {
         </div>
 
         <p class="auth-footer-text">
-            By continuing, you agree to use the VehicleCare system responsibly.
+            By continuing, you agree to use the Vehicle Documents Manager system responsibly.
         </p>
 
     </div>
