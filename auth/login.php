@@ -66,6 +66,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Rotate the CSRF token after successful login.
                 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
+                if (isset($_POST['remember'])) {
+                    $token = bin2hex(random_bytes(32));
+                    $updateStmt = $pdo->prepare('UPDATE users SET remember_token = :token WHERE id = :id');
+                    $updateStmt->execute(['token' => $token, 'id' => $user['id']]);
+                    setcookie('remember_token', $token, time() + (30 * 24 * 60 * 60), '/', '', false, true);
+                }
+
                 // Redirect to the dashboard.
                 header('Location: ../dashboard.php');
                 exit;
@@ -105,7 +112,7 @@ include __DIR__ . '/../includes/header.php';
                 <i class="bi bi-car-front-fill"></i>
             </span>
 
-            <span>VehicleCare</span>
+            <span>Vehicle Documents Manager</span>
 
         </a>
 
@@ -194,7 +201,7 @@ if ($googleError === 'account_exists') {
                             Password
                         </label>
 
-                        <a href="#" id="forgotPasswordLink">
+                        <a href="forgot-password.php" id="forgotPasswordLink">
                             Forgot password?
                         </a>
 
@@ -233,6 +240,7 @@ if ($googleError === 'account_exists') {
                         <input
                             type="checkbox"
                             id="remember"
+                            name="remember"
                         >
 
                         <span>Remember me</span>
@@ -262,7 +270,7 @@ if ($googleError === 'account_exists') {
             </a>
 
             <div class="auth-divider">
-                <span>New to VehicleCare?</span>
+                <span>New to Vehicle Documents Manager?</span>
             </div>
 
             <a
@@ -304,11 +312,17 @@ passwordToggle.addEventListener("click", function () {
     );
 });
 
-// Password recovery is not implemented yet.
-document.getElementById("forgotPasswordLink")
-    .addEventListener("click", function (event) {
-        event.preventDefault();
+// Button loading state with car animation
+const loginForm = document.getElementById("loginForm");
+if (loginForm) {
+    loginForm.addEventListener("submit", function () {
+        const submitBtn = this.querySelector(".auth-submit-btn");
+        if (submitBtn) {
+            submitBtn.innerHTML = 'Signing In... <img src="../assets/images/car-loader.svg" alt="Loading" class="btn-loader-icon" />';
+            submitBtn.classList.add("loading");
+        }
     });
+}
 </script>
 
 </body>

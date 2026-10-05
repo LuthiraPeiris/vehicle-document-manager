@@ -124,7 +124,8 @@
         linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px) 0 0 / 52px 52px,
         linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px) 0 0 / 52px 52px,
         #080D20;
-    box-shadow: 0 40px 90px rgba(11,16,34,.28);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 40px 90px rgba(11,16,34,.28), 0 0 80px rgba(47,91,255,0.15);
 }
 
 .hero-content {
@@ -201,15 +202,16 @@
 }
 
 .hero-primary-btn {
-    background: var(--vd-accent);
+    background: linear-gradient(135deg, #3B82F6 0%, #7C3AED 100%);
     color: #fff;
-    box-shadow: 0 12px 30px rgba(47,91,255,.5);
+    box-shadow: 0 12px 30px rgba(99, 102, 241, 0.4);
+    border: none;
 }
 
 .hero-primary-btn:hover {
-    background: #4a70ff;
     color: #fff;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(99, 102, 241, 0.6);
 }
 
 .hero-secondary-btn {
@@ -257,6 +259,22 @@
     object-fit: contain;
     object-position: center bottom;
     filter: drop-shadow(0 22px 26px rgba(0,0,0,.45));
+    animation: floatCar 6s ease-in-out infinite;
+}
+
+@keyframes floatCar {
+    0% {
+        transform: translateY(0);
+        filter: drop-shadow(0 22px 26px rgba(0,0,0,.45));
+    }
+    50% {
+        transform: translateY(-15px);
+        filter: drop-shadow(0 32px 30px rgba(0,0,0,.3));
+    }
+    100% {
+        transform: translateY(0);
+        filter: drop-shadow(0 22px 26px rgba(0,0,0,.45));
+    }
 }
 
 /* =========================================================
@@ -325,8 +343,6 @@
 
 .feature-card:hover {
     transform: translateY(-12px) scale(1.03);
-    box-shadow: 0 25px 50px rgba(37, 99, 235, 0.28);
-    border-color: #3B82F6;
     cursor: pointer;
 }
 
@@ -338,13 +354,9 @@
     place-items: center;
     border-radius: 14px;
     font-size: 22px;
-}
-
-.feature-icon.blue,
-.feature-icon.purple,
-.feature-icon.orange {
-    background: #E6F2FF;
-    color: #2563EB;
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .feature-card h3 {
@@ -352,39 +364,55 @@
     font-size: 24px;
     font-weight: 700;
     letter-spacing: -.5px;
+    color: #ffffff;
 }
 
 .feature-card p {
     margin: 0;
-    color: var(--vd-muted);
+    color: rgba(255, 255, 255, 0.9);
     font-size: 16px;
     line-height: 1.65;
 }
 
-/* All four document cards: consistent light blue */
-.feature-card:nth-child(1),
-.feature-card:nth-child(2),
-.feature-card:nth-child(3),
+/* Vibrant Gradient Cards */
+.feature-card {
+    border: none;
+}
+
+/* Driving License */
+.feature-card:nth-child(1) {
+    background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+    box-shadow: 0 14px 36px rgba(37, 99, 235, 0.2);
+}
+.feature-card:nth-child(1):hover {
+    box-shadow: 0 25px 50px rgba(37, 99, 235, 0.4);
+}
+
+/* Revenue License */
+.feature-card:nth-child(2) {
+    background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+    box-shadow: 0 14px 36px rgba(139, 92, 246, 0.2);
+}
+.feature-card:nth-child(2):hover {
+    box-shadow: 0 25px 50px rgba(139, 92, 246, 0.4);
+}
+
+/* Vehicle Insurance */
+.feature-card:nth-child(3) {
+    background: linear-gradient(135deg, #F97316 0%, #C2410C 100%);
+    box-shadow: 0 14px 36px rgba(249, 115, 22, 0.2);
+}
+.feature-card:nth-child(3):hover {
+    box-shadow: 0 25px 50px rgba(249, 115, 22, 0.4);
+}
+
+/* Emission Test */
 .feature-card:nth-child(4) {
-    color: var(--vd-ink);
-    background: #DCEBFA;
-    border: 1px solid #BBD7F5;
-    box-shadow: 0 14px 36px rgba(37, 99, 235, 0.08);
+    background: linear-gradient(135deg, #10B981 0%, #047857 100%);
+    box-shadow: 0 14px 36px rgba(16, 185, 129, 0.2);
 }
-
-.feature-card:nth-child(1) p,
-.feature-card:nth-child(2) p,
-.feature-card:nth-child(3) p,
-.feature-card:nth-child(4) p {
-    color: var(--vd-muted);
-}
-
-.feature-card:nth-child(1) .feature-icon,
-.feature-card:nth-child(2) .feature-icon,
-.feature-card:nth-child(3) .feature-icon,
-.feature-card:nth-child(4) .feature-icon {
-    background: #C7E2FF;
-    color: #2563EB;
+.feature-card:nth-child(4):hover {
+    box-shadow: 0 25px 50px rgba(16, 185, 129, 0.4);
 }
 
 /* =========================================================

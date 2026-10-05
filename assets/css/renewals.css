@@ -1,87 +1,118 @@
 /* =========================================================
    RENEWALS PAGE
+   Theme: Premium Light
 ========================================================= */
 
 .renewal-summary-badge {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    min-height: 38px;
-    padding: 0 12px;
-    border: 1px solid #fed7aa;
-    border-radius: 9px;
-    background: #fff7ed;
-    color: #c2410c;
-    font-size: 11px;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 16px;
+    border: 1px solid rgba(217, 119, 6, 0.2);
+    border-radius: var(--radius-sm);
+    background: var(--warning-soft);
+    color: var(--warning);
+    font-size: 13px;
     font-weight: 650;
+    box-shadow: 0 2px 4px rgba(217, 119, 6, 0.05);
 }
 
 .renewal-summary-badge i {
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .renewal-overview-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
-    margin-bottom: 26px;
+    gap: 24px;
+    margin-bottom: 32px;
 }
 
 .renewal-overview-card {
-    min-height: 100px;
-    padding: 17px;
+    position: relative;
+    min-height: 110px;
+    padding: 24px;
     display: flex;
     align-items: center;
-    gap: 13px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    background: var(--surface);
+    gap: 20px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     box-shadow: var(--shadow-sm);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+}
+
+.renewal-overview-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    border-color: var(--primary-soft);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 0 20px var(--primary-soft);
 }
 
 .renewal-overview-icon {
-    width: 45px;
-    height: 45px;
-    flex: 0 0 45px;
+    width: 52px;
+    height: 52px;
+    flex: 0 0 52px;
     display: grid;
     place-items: center;
-    border-radius: 11px;
-    font-size: 18px;
+    border-radius: var(--radius-md);
+    font-size: 24px;
+    transition: transform 0.3s ease;
+}
+
+.renewal-overview-card:hover .renewal-overview-icon {
+    transform: scale(1.1) rotate(5deg);
 }
 
 .renewal-overview-card.urgent .renewal-overview-icon {
     background: var(--danger-soft);
     color: var(--danger);
+    box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.15);
 }
 
 .renewal-overview-card.upcoming .renewal-overview-icon {
     background: var(--warning-soft);
     color: var(--warning);
+    box-shadow: inset 0 0 0 1px rgba(217, 119, 6, 0.15);
 }
 
 .renewal-overview-card.expired .renewal-overview-icon {
-    background: #fee2e2;
-    color: #b91c1c;
+    background: rgba(220, 38, 38, 0.1);
+    color: var(--danger);
+    box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.2);
+}
+
+.renewal-overview-card > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .renewal-overview-card span {
-    display: block;
-    margin-bottom: 2px;
     color: var(--text-muted);
-    font-size: 10.5px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .renewal-overview-card strong {
-    display: inline-block;
-    margin-right: 5px;
     color: var(--text);
-    font-size: 22px;
-    line-height: 1;
+    font-size: clamp(28px, 2.5vw, 36px);
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #0f172a, #475569);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .renewal-overview-card small {
     color: var(--text-light);
-    font-size: 9.5px;
+    font-size: 12px;
+    font-weight: 500;
 }
 
 
@@ -90,42 +121,53 @@
 --------------------------------------------------------- */
 
 .renewals-section {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .renewal-filter {
-    width: 170px;
-    height: 40px;
-    padding: 0 11px;
-    border: 1px solid var(--border);
-    border-radius: 9px;
+    width: 200px;
+    height: 48px;
+    padding: 0 16px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
     background: var(--surface);
     color: var(--text);
-    font-size: 11.5px;
+    font-size: 14px;
+    font-weight: 500;
     outline: none;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .renewal-filter:focus {
-    border-color: #93c5fd;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+    border-color: var(--primary-soft);
+    box-shadow: 0 0 0 4px var(--primary-soft), var(--shadow-sm);
 }
 
 .renewal-list-card {
     overflow: hidden;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    background: var(--surface);
-    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-md);
 }
 
 .renewal-page-item {
     position: relative;
     display: grid;
-    grid-template-columns: 62px 22px minmax(0, 1fr);
-    gap: 12px;
-    min-height: 115px;
-    padding: 17px 20px;
+    grid-template-columns: 80px 30px minmax(0, 1fr);
+    gap: 16px;
+    min-height: 120px;
+    padding: 24px;
     border-bottom: 1px solid var(--border-light);
+    transition: background 0.3s ease;
+}
+
+.renewal-page-item:hover {
+    background: var(--surface-soft);
 }
 
 .renewal-page-item:last-child {
@@ -133,23 +175,24 @@
 }
 
 .renewal-date-column {
-    padding-top: 3px;
+    padding-top: 4px;
     text-align: center;
 }
 
 .renewal-date-column strong {
     display: block;
-    font-size: 21px;
+    font-size: 24px;
     line-height: 1;
-    font-weight: 750;
+    font-weight: 800;
 }
 
 .renewal-date-column span {
     display: block;
-    margin-top: 3px;
-    font-size: 9px;
+    margin-top: 4px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
 }
 
 .renewal-date-column.danger strong,
@@ -179,10 +222,10 @@
 .renewal-timeline-line::after {
     content: "";
     position: absolute;
-    top: 17px;
-    bottom: -17px;
-    width: 1px;
-    background: var(--border);
+    top: 24px;
+    bottom: -24px;
+    width: 2px;
+    background: var(--border-light);
 }
 
 .renewal-page-item:last-child .renewal-timeline-line::after {
@@ -192,12 +235,12 @@
 .timeline-dot {
     position: relative;
     z-index: 2;
-    width: 10px;
-    height: 10px;
-    margin-top: 5px;
-    border: 2px solid var(--surface);
+    width: 14px;
+    height: 14px;
+    margin-top: 6px;
+    border: 3px solid var(--surface);
     border-radius: 50%;
-    box-shadow: 0 0 0 1px currentColor;
+    box-shadow: 0 0 0 1px currentColor, 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .timeline-dot.danger {
@@ -219,24 +262,29 @@
     display: grid;
     grid-template-columns: minmax(250px, 1.6fr) minmax(150px, 1fr) auto;
     align-items: center;
-    gap: 20px;
+    gap: 24px;
 }
 
 .renewal-page-main {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
     min-width: 0;
 }
 
 .renewal-page-icon {
-    width: 42px;
-    height: 42px;
-    flex: 0 0 42px;
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
     display: grid;
     place-items: center;
-    border-radius: 10px;
-    font-size: 17px;
+    border-radius: 12px;
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+.renewal-page-item:hover .renewal-page-icon {
+    transform: scale(1.1);
 }
 
 .danger-icon {
@@ -249,21 +297,28 @@
     color: var(--warning);
 }
 
+.renewal-page-main > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
 .renewal-page-main h3 {
-    margin: 0 0 4px;
+    margin: 0;
     color: var(--text);
-    font-size: 12.5px;
-    font-weight: 680;
+    font-size: 15px;
+    font-weight: 700;
 }
 
 .renewal-page-main p {
     margin: 0;
     color: var(--text-muted);
-    font-size: 10.5px;
+    font-size: 13px;
+    font-weight: 500;
 }
 
 .renewal-page-main p span {
-    margin: 0 3px;
+    margin: 0 4px;
     color: var(--text-light);
 }
 
@@ -271,30 +326,38 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 7px;
+    gap: 8px;
 }
 
 .renewal-page-status strong {
     color: var(--text-muted);
-    font-size: 10.5px;
-    font-weight: 550;
-}
-
-.renewal-action-btn {
-    min-height: 36px;
-    padding: 0 11px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--surface);
-    color: var(--text-muted);
-    font-size: 10.5px;
+    font-size: 13px;
     font-weight: 600;
 }
 
+.renewal-action-btn {
+    min-height: 40px;
+    padding: 0 16px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .renewal-action-btn:hover {
-    border-color: #bfdbfe;
+    border-color: var(--primary-soft);
     background: var(--primary-soft);
     color: var(--primary);
+    transform: translateY(-2px);
 }
 
 
@@ -305,52 +368,61 @@
 .reminder-info-card {
     display: flex;
     align-items: center;
-    gap: 13px;
-    padding: 16px 18px;
-    border: 1px solid #dbeafe;
+    gap: 16px;
+    padding: 20px 24px;
+    border: 1px solid rgba(79, 70, 229, 0.2);
     border-radius: var(--radius-md);
-    background: #f8fbff;
+    background: var(--primary-soft);
 }
 
 .reminder-info-icon {
-    width: 40px;
-    height: 40px;
-    flex: 0 0 40px;
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
     display: grid;
     place-items: center;
-    border-radius: 10px;
-    background: #dbeafe;
+    border-radius: 12px;
+    background: var(--surface);
     color: var(--primary);
-    font-size: 17px;
+    font-size: 20px;
+    box-shadow: var(--shadow-sm);
 }
 
 .reminder-info-card > div:nth-child(2) {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .reminder-info-card h3 {
-    margin: 0 0 3px;
-    font-size: 12px;
-    font-weight: 680;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
 }
 
 .reminder-info-card p {
     margin: 0;
     color: var(--text-muted);
-    font-size: 10.5px;
+    font-size: 13px;
+    font-weight: 500;
 }
 
 .reminder-status {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     color: var(--success);
-    font-size: 10.5px;
+    font-size: 13px;
     font-weight: 650;
+    padding: 6px 12px;
+    background: var(--success-soft);
+    border-radius: 20px;
 }
 
 .reminder-status i {
-    font-size: 13px;
+    font-size: 14px;
 }
 
 
@@ -360,22 +432,24 @@
 
 .renewals-empty-state {
     display: none;
-    padding: 55px 20px;
-    border: 1px dashed #cbd5e1;
-    border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.75);
+    padding: 64px 20px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-soft);
     text-align: center;
 }
 
 .renewals-empty-state h3 {
-    margin: 0 0 4px;
-    font-size: 15px;
+    margin: 0 0 8px;
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 700;
 }
 
 .renewals-empty-state p {
     margin: 0;
     color: var(--text-muted);
-    font-size: 11.5px;
+    font-size: 14px;
 }
 
 
@@ -420,13 +494,13 @@
     }
 
     .renewal-page-item {
-        grid-template-columns: 48px 18px minmax(0, 1fr);
-        padding: 15px;
+        grid-template-columns: 60px 20px minmax(0, 1fr);
+        padding: 20px;
     }
 
     .renewal-page-content {
         grid-template-columns: 1fr;
-        gap: 12px;
+        gap: 16px;
     }
 
     .renewal-page-status,
@@ -446,92 +520,91 @@
 
     .reminder-status {
         width: 100%;
-        padding-left: 53px;
     }
 
 }
+
+
 /* ---------------------------------------------------------
    RENEWAL HISTORY PAGE
 --------------------------------------------------------- */
 
 .history-page .renewal-overview-grid {
     grid-template-columns: minmax(0, 360px);
-    margin-bottom: 24px;
+    margin-bottom: 32px;
 }
 
 .history-page .renewal-overview-card {
-    min-height: 96px;
-    padding: 18px 20px;
-    border-color: #e9edf6;
-    border-radius: 18px;
-    background: #ffffff;
-    box-shadow: 0 8px 24px rgba(11, 16, 34, 0.04);
+    min-height: 100px;
+    padding: 24px;
+    border-color: var(--border-light);
+    border-radius: var(--radius-lg);
+    background: var(--glass-bg);
+    box-shadow: var(--shadow-sm);
 }
 
 .history-page .renewal-overview-card .renewal-overview-icon {
-    background: #edf1ff;
-    color: #2f5bff;
+    background: var(--primary-soft);
+    color: var(--primary);
 }
 
 .history-page .section-heading {
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
 }
 
 .history-page .section-heading h2 {
-    margin: 0 0 5px;
-    color: #0b1022;
-    font-size: 16px;
+    margin: 0 0 8px;
+    color: var(--text);
+    font-size: 19px;
     font-weight: 700;
-    line-height: 1.4;
 }
 
 .history-page .section-heading p {
     margin: 0;
-    color: #64708a;
-    font-size: 12px;
-    line-height: 1.5;
+    color: var(--text-muted);
+    font-size: 14px;
 }
 
 .history-page .renewal-filter {
-    width: 205px;
-    height: 42px;
-    border-color: #cbd5e1;
-    background: #ffffff;
-    color: #17233b;
-    font-size: 12px;
+    width: 220px;
+    height: 48px;
+    border-color: var(--border-light);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 14px;
 }
 
 .history-page .renewal-filter:focus {
-    border-color: #2f5bff;
-    box-shadow: 0 0 0 3px rgba(47, 91, 255, 0.12);
+    border-color: var(--primary-soft);
+    box-shadow: 0 0 0 4px var(--primary-soft), var(--shadow-sm);
 }
 
 .history-page .renewal-list-card {
     overflow: hidden;
-    border: 1px solid #e5eaf3;
-    border-radius: 18px;
-    background: #ffffff;
-    box-shadow: 0 8px 24px rgba(11, 16, 34, 0.04);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    background: var(--glass-bg);
+    box-shadow: var(--shadow-md);
 }
 
 .history-page .renewal-page-item {
     display: block;
     min-height: 0;
-    padding: 18px 22px;
-    border-bottom: 1px solid #edf0f7;
-    transition: background-color 180ms ease;
+    padding: 24px;
+    border-bottom: 1px solid var(--border-light);
+    transition: background-color 0.3s ease;
 }
 
 .history-page .renewal-page-item:hover {
-    background-color: #f8faff;
+    background-color: var(--surface-soft);
 }
 
 .history-page .renewal-page-content {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
-    gap: 20px;
+    gap: 24px;
 }
 
 .history-page .renewal-page-main {
@@ -544,58 +617,53 @@
 }
 
 .history-page .renewal-page-main h3 {
-    margin: 0 0 5px;
-    color: #0b1022;
-    font-size: 14px;
+    margin: 0 0 6px;
+    color: var(--text);
+    font-size: 16px;
     font-weight: 700;
-    line-height: 1.4;
 }
 
 .history-page .renewal-page-main p {
     margin: 0;
-    color: #536079;
-    font-size: 12px;
-    line-height: 1.5;
-    overflow-wrap: anywhere;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
 }
 
 .history-page .renewal-page-main p span {
-    margin: 0 4px;
-    color: #94a3b8;
+    margin: 0 6px;
+    color: var(--text-light);
 }
 
 .history-page .renewal-page-main small {
     display: block;
-    margin-top: 6px;
-    color: #64708a;
-    font-size: 11px;
-    line-height: 1.5;
-    overflow-wrap: anywhere;
+    margin-top: 8px;
+    color: var(--text-light);
+    font-size: 12px;
 }
 
 .history-page .renewal-page-icon.normal-icon {
-    background: #edf1ff;
-    color: #2f5bff;
+    background: var(--primary-soft);
+    color: var(--primary);
 }
 
 .history-page .renewal-page-status .status-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 10px;
-    border: 1px solid #dce3ef;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px solid var(--border-light);
     border-radius: 999px;
-    background: #f4f6fa;
-    color: #536079;
-    font-size: 11px;
+    background: var(--surface-soft);
+    color: var(--text-muted);
+    font-size: 13px;
     font-weight: 650;
-    white-space: nowrap;
 }
 
 .history-page .renewal-page-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
 }
 
 .history-page .renewal-page-actions:empty {
@@ -606,62 +674,61 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    min-height: 38px;
-    padding: 0 12px;
-    border-color: #dce3ef;
-    border-radius: 9px;
-    color: #536079;
-    font-size: 11.5px;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
     text-decoration: none;
-    transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
 }
 
 .history-page .renewal-action-btn:hover {
-    border-color: #cbd7ff;
-    background: #f4f6ff;
-    color: #2f5bff;
-}
-
-.history-page .renewal-action-btn:focus-visible {
-    outline: 3px solid rgba(47, 91, 255, 0.28);
-    outline-offset: 2px;
+    border-color: var(--primary-soft);
+    background: var(--primary-soft);
+    color: var(--primary);
+    transform: translateY(-2px);
 }
 
 .history-page .renewals-empty-state {
     display: block;
-    padding: 44px 22px;
-    border: 1px dashed #cbd5e1;
-    border-radius: 16px;
-    background: #fbfcff;
+    padding: 64px 24px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-soft);
     text-align: center;
 }
 
 .history-page .renewals-empty-state .empty-icon {
-    margin-bottom: 12px;
-    color: #64708a;
-    font-size: 28px;
+    margin-bottom: 16px;
+    color: var(--text-muted);
+    font-size: 32px;
 }
 
 .history-page .renewals-empty-state h3 {
-    margin: 0 0 6px;
-    color: #0b1022;
-    font-size: 16px;
+    margin: 0 0 8px;
+    color: var(--text);
+    font-size: 17px;
     font-weight: 700;
 }
 
 .history-page .renewals-empty-state p {
     max-width: 520px;
     margin: 0 auto 16px;
-    color: #64708a;
-    font-size: 12px;
+    color: var(--text-muted);
+    font-size: 14px;
     line-height: 1.6;
 }
 
 @media (max-width: 900px) {
     .history-page .renewal-page-content {
         grid-template-columns: minmax(0, 1fr) auto;
-        gap: 14px 18px;
+        gap: 16px 20px;
     }
 
     .history-page .renewal-page-main {
@@ -693,12 +760,12 @@
     }
 
     .history-page .renewal-page-item {
-        padding: 16px;
+        padding: 20px;
     }
 
     .history-page .renewal-page-content {
         grid-template-columns: minmax(0, 1fr);
-        gap: 12px;
+        gap: 16px;
     }
 
     .history-page .renewal-page-main {
@@ -717,13 +784,6 @@
     }
 
     .history-page .renewals-empty-state {
-        padding: 36px 18px;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .history-page .renewal-page-item,
-    .history-page .renewal-action-btn {
-        transition: none;
+        padding: 40px 20px;
     }
 }
