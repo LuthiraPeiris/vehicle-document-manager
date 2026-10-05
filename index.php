@@ -25,8 +25,8 @@
             </span>
 
             <h1>
-                Never miss a
-                <span>vehicle renewal.</span>
+                <span class="hero-heading-line">Never Miss a</span>
+                <span>Vehicle Renewal.</span>
             </h1>
 
             <p>

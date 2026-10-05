@@ -312,13 +312,13 @@ passwordToggle.addEventListener("click", function () {
     );
 });
 
-// Button loading state with car animation
+// Button loading state
 const loginForm = document.getElementById("loginForm");
 if (loginForm) {
     loginForm.addEventListener("submit", function () {
         const submitBtn = this.querySelector(".auth-submit-btn");
         if (submitBtn) {
-            submitBtn.innerHTML = 'Signing In... <img src="../assets/images/car-loader.svg" alt="Loading" class="btn-loader-icon" />';
+            submitBtn.innerHTML = 'Signing In...';
             submitBtn.classList.add("loading");
         }
     });
