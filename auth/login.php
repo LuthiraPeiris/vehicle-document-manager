@@ -112,7 +112,7 @@ include __DIR__ . '/../includes/header.php';
                 <i class="bi bi-car-front-fill"></i>
             </span>
 
-            <span>VehicleCare</span>
+            <span>Vehicle Documents Manager</span>
 
         </a>
 
@@ -270,7 +270,7 @@ if ($googleError === 'account_exists') {
             </a>
 
             <div class="auth-divider">
-                <span>New to VehicleCare?</span>
+                <span>New to Vehicle Documents Manager?</span>
             </div>
 
             <a
@@ -312,7 +312,17 @@ passwordToggle.addEventListener("click", function () {
     );
 });
 
-
+// Button loading state with car animation
+const loginForm = document.getElementById("loginForm");
+if (loginForm) {
+    loginForm.addEventListener("submit", function () {
+        const submitBtn = this.querySelector(".auth-submit-btn");
+        if (submitBtn) {
+            submitBtn.innerHTML = 'Signing In... <img src="../assets/images/car-loader.svg" alt="Loading" class="btn-loader-icon" />';
+            submitBtn.classList.add("loading");
+        }
+    });
+}
 </script>
 
 </body>

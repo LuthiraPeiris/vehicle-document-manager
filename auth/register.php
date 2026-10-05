@@ -136,7 +136,7 @@ include __DIR__ . '/../includes/header.php';
             <span class="public-brand-icon">
                 <i class="bi bi-car-front-fill"></i>
             </span>
-            <span>VehicleCare</span>
+            <span>Vehicle Documents Manager</span>
         </a>
     </div>
 

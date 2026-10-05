@@ -452,6 +452,25 @@
     outline-offset: 3px;
 }
 
+.btn-loader-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    animation: loaderBounce 0.5s infinite alternate cubic-bezier(0.5, 0.05, 1, 0.5);
+}
+
+.auth-submit-btn.loading {
+    opacity: 0.9;
+    cursor: wait;
+    pointer-events: none;
+}
+
+@keyframes loaderBounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-4px); }
+}
+
 
 /* ---------------------------------------------------------
    10. DIVIDER
