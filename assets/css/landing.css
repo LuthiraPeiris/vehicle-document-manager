@@ -379,45 +379,15 @@
     line-height: 1.65;
 }
 
-/* Vibrant Gradient Cards */
+/* Theme Gradient Color Cards */
 .feature-card {
     border: none;
+    background: linear-gradient(135deg, #3B82F6 0%, #7C3AED 100%);
+    box-shadow: 0 14px 36px rgba(59, 130, 246, 0.2);
 }
 
-/* Driving License */
-.feature-card:nth-child(1) {
-    background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
-    box-shadow: 0 14px 36px rgba(37, 99, 235, 0.2);
-}
-.feature-card:nth-child(1):hover {
-    box-shadow: 0 25px 50px rgba(37, 99, 235, 0.4);
-}
-
-/* Revenue License */
-.feature-card:nth-child(2) {
-    background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
-    box-shadow: 0 14px 36px rgba(139, 92, 246, 0.2);
-}
-.feature-card:nth-child(2):hover {
-    box-shadow: 0 25px 50px rgba(139, 92, 246, 0.4);
-}
-
-/* Vehicle Insurance */
-.feature-card:nth-child(3) {
-    background: linear-gradient(135deg, #F97316 0%, #C2410C 100%);
-    box-shadow: 0 14px 36px rgba(249, 115, 22, 0.2);
-}
-.feature-card:nth-child(3):hover {
-    box-shadow: 0 25px 50px rgba(249, 115, 22, 0.4);
-}
-
-/* Emission Test */
-.feature-card:nth-child(4) {
-    background: linear-gradient(135deg, #10B981 0%, #047857 100%);
-    box-shadow: 0 14px 36px rgba(16, 185, 129, 0.2);
-}
-.feature-card:nth-child(4):hover {
-    box-shadow: 0 25px 50px rgba(16, 185, 129, 0.4);
+.feature-card:hover {
+    box-shadow: 0 25px 50px rgba(59, 130, 246, 0.4);
 }
 
 /* =========================================================
