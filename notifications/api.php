@@ -39,15 +39,15 @@ try {
         $items = [];
         foreach ($list->fetchAll() as $row) {
             if ($row['accessible_document_id'] === null) {
-                $url = '/vehicle-document-manager/documents/index.php';
+                $url = '/documents/index.php';
             } elseif (!(bool) $row['is_current']) {
-                $url = '/vehicle-document-manager/documents/renewal_history.php';
+                $url = '/documents/renewal_history.php';
             } elseif (!empty($row['file_path'])) {
-                $url = '/vehicle-document-manager/documents/file.php?id=' . (int) $row['accessible_document_id'];
+                $url = '/documents/file.php?id=' . (int) $row['accessible_document_id'];
             } elseif ($row['vehicle_id'] !== null) {
-                $url = '/vehicle-document-manager/vehicles/view.php?id=' . (int) $row['vehicle_id'];
+                $url = '/vehicles/view.php?id=' . (int) $row['vehicle_id'];
             } else {
-                $url = '/vehicle-document-manager/documents/index.php';
+                $url = '/documents/index.php';
             }
             $row['id'] = (int) $row['id'];
             $row['is_read'] = (bool) $row['is_read'];

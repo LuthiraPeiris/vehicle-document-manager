@@ -27,7 +27,7 @@ if (!$user) {
     session_unset();
     session_destroy();
 
-    header('Location: /vehicle-document-manager/auth/login.php');
+    header('Location: /auth/login.php');
     exit;
 }
 
