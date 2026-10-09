@@ -44,7 +44,11 @@ try {
     $fromEmail = getenv('SMTP_FROM_EMAIL') ?: (getenv('SMTP_USER') ?: ($mailConfig['from_email'] ?? ($mailConfig['username'] ?? '')));
     $fromName  = getenv('SMTP_FROM_NAME') ?: ($mailConfig['from_name'] ?? 'VehicleCare');
 
-    if ($brevoApiKey === '') {
+    if ($brevoApiKey !== '') {
+        if ($fromEmail === '') {
+            throw new RuntimeException('Missing sender email configuration. Please set SMTP_FROM_EMAIL or SMTP_USER in environment variables.');
+        }
+    } else {
         $mailConfig = [
             'host' => getenv('SMTP_HOST') ?: ($mailConfig['host'] ?? ''),
             'port' => (int) (getenv('SMTP_PORT') ?: ($mailConfig['port'] ?? 587)),
