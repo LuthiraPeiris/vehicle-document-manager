@@ -4,6 +4,7 @@
 require_once __DIR__ . '/../includes/auth-check.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/storage.php';
+require_once __DIR__ . '/../config/cloud-notifications.php';
 
 $userId = (int) $_SESSION['user_id'];
 
@@ -358,41 +359,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
 
             if ($uploadedFile !== null) {
-                if (!is_dir(DOCUMENT_STORAGE_PATH)
-                    && !mkdir(DOCUMENT_STORAGE_PATH, 0750, true)
-                    && !is_dir(DOCUMENT_STORAGE_PATH)
-                ) {
-                    throw new RuntimeException('Unable to prepare document storage.');
-                }
 
-                $storedName = bin2hex(random_bytes(24)) . '.' . $uploadedFile['extension'];
-                $absolutePath = DOCUMENT_STORAGE_PATH . DIRECTORY_SEPARATOR . $storedName;
+    /*
+     * Generate a random object name.
+     *
+     * The database will continue storing values such as:
+     * storage/abcdef123456....pdf
+     *
+     * This same value becomes the R2 object key.
+     */
+    $storedName = bin2hex(random_bytes(24))
+        . '.' . $uploadedFile['extension'];
 
-                if (!move_uploaded_file($uploadedFile['tmp_name'], $absolutePath)) {
-                    throw new RuntimeException('Unable to store uploaded document.');
-                }
+    $objectKey = 'storage/' . $storedName;
 
-                $newStoredFilePath = $absolutePath;
-                $fileMetadata = [
-                    'file_path' => 'storage/' . $storedName,
-                    'original_file_name' => $uploadedFile['original_name'],
-                    'file_mime_type' => $uploadedFile['mime_type'],
-                    'file_size' => $uploadedFile['size'],
-                ];
-            } elseif ($renewingDocument) {
-                // If no replacement is uploaded, copy the existing file metadata
-                // to the new current record; the historical record keeps its own.
-                $fileMetadata = [
-                    'file_path' => $renewingDocument['file_path'] ?? null,
-                    'original_file_name' => $renewingDocument['original_file_name'] ?? null,
-                    'file_mime_type' => $renewingDocument['file_mime_type'] ?? null,
-                    'file_size' => $renewingDocument['file_size'] ?? null,
-                ];
-            }
+    /*
+     * Upload the temporary PHP upload directly to Cloudflare R2.
+     */
+    uploadDocumentToR2(
+        $uploadedFile['tmp_name'],
+        $objectKey,
+        $uploadedFile['mime_type']
+    );
 
-            $pdo->beginTransaction();
+    /*
+     * Keep the R2 object key in the database.
+     */
+    $fileMetadata = [
+        'file_path' => $objectKey,
+        'original_file_name' => $uploadedFile['original_name'],
+        'file_mime_type' => $uploadedFile['mime_type'],
+        'file_size' => $uploadedFile['size'],
+    ];
 
-            if ($renewingDocument) {
+} elseif ($renewingDocument) {
                 $deactivateOld = $pdo->prepare(
                     'UPDATE documents
                      SET is_current = 0
@@ -457,6 +457,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $newDocumentId = (int) $pdo->lastInsertId();
             $pdo->commit();
 
+            // Synchronize the new document with the cloud notification service.
+$cloudDocumentQuery = $pdo->prepare(
+    'SELECT
+        d.id,
+        d.document_type,
+        d.expiry_date,
+        d.is_current,
+        u.full_name AS user_name,
+        u.email AS user_email,
+        v.registration_number
+     FROM documents d
+     INNER JOIN users u
+        ON u.id = d.user_id
+     LEFT JOIN vehicles v
+        ON v.id = d.vehicle_id
+        AND v.user_id = d.user_id
+     WHERE d.id = :document_id
+       AND d.user_id = :user_id
+     LIMIT 1'
+);
+
+$cloudDocumentQuery->execute([
+    'document_id' => $newDocumentId,
+    'user_id' => $userId,
+]);
+
+$cloudDocument = $cloudDocumentQuery->fetch();
+
+if ($cloudDocument) {
+    syncDocumentToCloud([
+        'local_document_id' => $cloudDocument['id'],
+        'user_name' => $cloudDocument['user_name'],
+        'user_email' => $cloudDocument['user_email'],
+        'vehicle_registration' => $cloudDocument['registration_number'],
+        'document_type' => $cloudDocument['document_type'],
+        'expiry_date' => $cloudDocument['expiry_date'],
+        'is_current' => $cloudDocument['is_current'],
+    ]);
+}
+
+if ($renewingDocument) {
+    syncDocumentToCloud([
+        'local_document_id' => $renewingDocument['id'],
+        'user_name' => $cloudDocument['user_name'],
+        'user_email' => $cloudDocument['user_email'],
+        'vehicle_registration' => $cloudDocument['registration_number'],
+        'document_type' => $renewingDocument['document_type'],
+        'expiry_date' => $renewingDocument['expiry_date'],
+        'is_current' => 0,
+    ]);
+}
+
             /*
              * Driving Licenses are user-level documents.
              * Other documents return to their vehicle details page.
@@ -473,18 +525,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             exit;
         } catch (Throwable $e) {
-            if ($pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
 
-            // Avoid leaving an orphaned newly-uploaded file if saving fails.
-            if ($newStoredFilePath !== null && is_file($newStoredFilePath)) {
-                @unlink($newStoredFilePath);
-            }
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
 
-            error_log('Document save failed: ' . $e->getMessage());
-            $errors[] = 'The document could not be saved. Please try again.';
-        }
+    error_log('Document save failed: ' . $e->getMessage());
+
+    $errors[] = 'The document could not be saved. Please try again.';
+}
     }
 }
 
