@@ -35,30 +35,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $updateStmt = $pdo->prepare('UPDATE users SET reset_token = :token, reset_token_expires_at = DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE id = :id');
                 $updateStmt->execute(['token' => $token, 'id' => $user['id']]);
 
-                $resetLink = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . '/reset-password.php?token=' . $token;
-                
+                $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ? 'https://' : 'http://';
+                $resetLink = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . '/reset-password.php?token=' . $token;
+
+                $mailConfig = [];
                 $mailConfigPath = 'C:\\xampp\\private\\vehicle-document-manager-mail.php';
                 if (is_file($mailConfigPath)) {
                     $mailConfig = require $mailConfigPath;
+                }
+
+                $smtpHost = getenv('SMTP_HOST') ?: ($mailConfig['host'] ?? '');
+                $smtpPort = (int) (getenv('SMTP_PORT') ?: ($mailConfig['port'] ?? 587));
+                $smtpUser = getenv('SMTP_USER') ?: ($mailConfig['username'] ?? '');
+                $smtpPass = getenv('SMTP_PASSWORD') ?: ($mailConfig['password'] ?? '');
+                $smtpEnc  = strtolower((string) (getenv('SMTP_ENCRYPTION') ?: ($mailConfig['encryption'] ?? 'tls')));
+                $fromEmail = getenv('SMTP_FROM_EMAIL') ?: ($mailConfig['from_email'] ?? $smtpUser);
+                $fromName  = getenv('SMTP_FROM_NAME') ?: ($mailConfig['from_name'] ?? 'VehicleCare');
+
+                if ($smtpHost !== '' && $smtpUser !== '' && $smtpPass !== '') {
                     $mail = new PHPMailer(true);
-                    
+
                     try {
                         $mail->isSMTP();
-                        $mail->Host = $mailConfig['host'];
+                        $mail->Host = $smtpHost;
                         $mail->SMTPAuth = true;
-                        $mail->Username = $mailConfig['username'];
-                        $mail->Password = $mailConfig['password'];
-                        $mail->Port = (int) $mailConfig['port'];
+                        $mail->Username = $smtpUser;
+                        $mail->Password = $smtpPass;
+                        $mail->Port = $smtpPort;
                         $mail->CharSet = 'UTF-8';
                         $mail->Timeout = 20;
 
-                        if (strtolower($mailConfig['encryption']) === 'tls') {
+                        if ($smtpEnc === 'tls') {
                             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                        } elseif (strtolower($mailConfig['encryption']) === 'ssl') {
+                        } elseif ($smtpEnc === 'ssl') {
                             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
                         }
 
-                        $mail->setFrom($mailConfig['from_email'], $mailConfig['from_name']);
+                        $mail->setFrom($fromEmail, $fromName);
                         $mail->addAddress($email);
 
                         $mail->isHTML(true);
