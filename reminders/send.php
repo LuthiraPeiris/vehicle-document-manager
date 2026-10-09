@@ -41,7 +41,7 @@ try {
         $mailConfig = require $mailConfigPath;
     }
 
-    $fromEmail = getenv('SMTP_FROM_EMAIL') ?: ($mailConfig['from_email'] ?? ($mailConfig['username'] ?? ''));
+    $fromEmail = getenv('SMTP_FROM_EMAIL') ?: (getenv('SMTP_USER') ?: ($mailConfig['from_email'] ?? ($mailConfig['username'] ?? '')));
     $fromName  = getenv('SMTP_FROM_NAME') ?: ($mailConfig['from_name'] ?? 'VehicleCare');
 
     if ($brevoApiKey === '') {
