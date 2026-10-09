@@ -13,7 +13,7 @@ if (PHP_SAPI !== 'cli') {
 use PHPMailer\PHPMailer\PHPMailer;
 
 // Prevent two copies of this script from running simultaneously.
-$lockPath = 'C:\\xampp\\private\\vehicle-document-manager-send.lock';
+$lockPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'vehicle-document-manager-send.lock';
 $lockHandle = fopen($lockPath, 'c');
 
 if ($lockHandle === false || !flock($lockHandle, LOCK_EX | LOCK_NB)) {
@@ -31,14 +31,27 @@ try {
     // Load PHPMailer installed by Composer.
     require_once __DIR__ . '/../vendor/autoload.php';
 
-    // Load SMTP credentials from outside htdocs.
+    // Load SMTP credentials from environment variables, or fallback to file if available.
+    $mailConfig = [];
     $mailConfigPath = 'C:\\xampp\\private\\vehicle-document-manager-mail.php';
 
-    if (!is_file($mailConfigPath)) {
-        throw new RuntimeException('Mail configuration file was not found.');
+    if (is_file($mailConfigPath)) {
+        $mailConfig = require $mailConfigPath;
     }
 
-    $mailConfig = require $mailConfigPath;
+    $mailConfig = [
+        'host' => getenv('SMTP_HOST') ?: ($mailConfig['host'] ?? ''),
+        'port' => (int) (getenv('SMTP_PORT') ?: ($mailConfig['port'] ?? 587)),
+        'encryption' => strtolower((string) (getenv('SMTP_ENCRYPTION') ?: ($mailConfig['encryption'] ?? 'tls'))),
+        'username' => getenv('SMTP_USER') ?: ($mailConfig['username'] ?? ''),
+        'password' => getenv('SMTP_PASSWORD') ?: ($mailConfig['password'] ?? ''),
+        'from_email' => getenv('SMTP_FROM_EMAIL') ?: ($mailConfig['from_email'] ?? ''),
+        'from_name' => getenv('SMTP_FROM_NAME') ?: ($mailConfig['from_name'] ?? 'VehicleCare'),
+    ];
+
+    if ($mailConfig['from_email'] === '' && $mailConfig['username'] !== '') {
+        $mailConfig['from_email'] = $mailConfig['username'];
+    }
 
     foreach (['host', 'port', 'encryption', 'username', 'password', 'from_email', 'from_name'] as $key) {
         if (!isset($mailConfig[$key]) || $mailConfig[$key] === '') {
