@@ -1,17 +1,24 @@
-
 <?php
 
-$host = 'localhost';
-$dbname = 'vehicle_document_manager';
-$username = 'root';
-$password = '';
+$host = getenv('DB_HOST') ?: 'vehiclemanager-luthirapeiris01-5d85.e.aivencloud.com';
+$port = getenv('DB_PORT') ?: '19842';
+$dbname = getenv('DB_NAME') ?: 'defaultdb';
+$username = getenv('DB_USER') ?: 'avnadmin';
+$password = getenv('DB_PASSWORD') ?: '';
+//$password = getenv('DB_PASSWORD') ?: 'AVNS_InZork2hysegtGxtnBD';
 
-$dsn = "mysql:host={$host};dbname={$dbname};charset=utf8mb4";
+$caCertificate = getenv('DB_CA_CERT')
+    ?: __DIR__ . '/../aiven-ca.pem';
+
+$dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
 
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     PDO::ATTR_EMULATE_PREPARES   => false,
+
+    PDO::MYSQL_ATTR_SSL_CA => $caCertificate,
+    PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true,
 ];
 
 try {

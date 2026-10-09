@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../includes/auth-check.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/storage.php';
+require_once __DIR__ . '/../config/cloud-notifications.php';
 
 $userId = (int) $_SESSION['user_id'];
 $documentId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
@@ -22,12 +23,24 @@ $newStoredFilePath = null;
 function fetchCurrentDocument(PDO $pdo, int $documentId, int $userId): array|false
 {
     $stmt = $pdo->prepare(
-        'SELECT d.*, v.registration_number, v.make, v.model
-         FROM documents d
-         LEFT JOIN vehicles v ON v.id = d.vehicle_id AND v.user_id = d.user_id
-         WHERE d.id = :document_id AND d.user_id = :user_id AND d.is_current = 1
-         LIMIT 1'
-    );
+    'SELECT
+        d.*,
+        v.registration_number,
+        v.make,
+        v.model,
+        u.full_name AS user_name,
+        u.email AS user_email
+     FROM documents d
+     INNER JOIN users u
+        ON u.id = d.user_id
+     LEFT JOIN vehicles v
+        ON v.id = d.vehicle_id
+        AND v.user_id = d.user_id
+     WHERE d.id = :document_id
+       AND d.user_id = :user_id
+       AND d.is_current = 1
+     LIMIT 1'
+);
     $stmt->execute(['document_id' => $documentId, 'user_id' => $userId]);
     return $stmt->fetch();
 }
@@ -119,23 +132,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
 
             if ($upload !== null) {
-                if (!is_dir(DOCUMENT_STORAGE_PATH)
-                    && !mkdir(DOCUMENT_STORAGE_PATH, 0750, true)
-                    && !is_dir(DOCUMENT_STORAGE_PATH)) {
-                    throw new RuntimeException('Unable to create document storage directory.');
-                }
-                $storedName = bin2hex(random_bytes(24)) . '.' . $upload['extension'];
-                $newStoredFilePath = DOCUMENT_STORAGE_PATH . DIRECTORY_SEPARATOR . $storedName;
-                if (!move_uploaded_file($upload['tmp_name'], $newStoredFilePath)) {
-                    throw new RuntimeException('Unable to move uploaded file.');
-                }
-                $fileMetadata = [
-                    'file_path' => 'storage/' . $storedName,
-                    'original_file_name' => $upload['original_file_name'],
-                    'file_mime_type' => $upload['file_mime_type'],
-                    'file_size' => $upload['file_size'],
-                ];
-            }
+
+    /*
+     * Generate a unique R2 object key.
+     */
+    $storedName = bin2hex(random_bytes(24))
+        . '.' . $upload['extension'];
+
+    $objectKey = 'storage/' . $storedName;
+
+    /*
+     * Upload the replacement file directly to Cloudflare R2.
+     */
+    uploadDocumentToR2(
+        $upload['tmp_name'],
+        $objectKey,
+        $upload['file_mime_type']
+    );
+
+    /*
+     * Store the R2 object key in MySQL.
+     */
+    $fileMetadata = [
+        'file_path' => $objectKey,
+        'original_file_name' => $upload['original_file_name'],
+        'file_mime_type' => $upload['file_mime_type'],
+        'file_size' => $upload['file_size'],
+    ];
+}
 
             $update = $pdo->prepare(
                 'UPDATE documents
@@ -167,15 +191,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
+            // Synchronize the updated document with the cloud notification service.
+$cloudDocument = fetchCurrentDocument($pdo, $documentId, $userId);
+
+if ($cloudDocument) {
+    syncDocumentToCloud([
+        'local_document_id' => $cloudDocument['id'],
+        'user_name' => $cloudDocument['user_name'],
+        'user_email' => $cloudDocument['user_email'],
+        'vehicle_registration' => $cloudDocument['registration_number'] ?? null,
+        'document_type' => $cloudDocument['document_type'],
+        'expiry_date' => $cloudDocument['expiry_date'],
+        'is_current' => $cloudDocument['is_current'],
+    ]);
+}
+
             header('Location: index.php?edited=1');
             exit;
         } catch (Throwable $e) {
-            if ($newStoredFilePath !== null && is_file($newStoredFilePath)) {
-                @unlink($newStoredFilePath);
-            }
-            error_log('Document edit failed: ' . $e->getMessage());
-            $errors[] = 'The document could not be updated. Please try again.';
-        }
+
+    error_log('Document edit failed: ' . $e->getMessage());
+
+    $errors[] = 'The document could not be updated. Please try again.';
+}
     }
 }
 
