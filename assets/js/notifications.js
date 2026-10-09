@@ -9,7 +9,7 @@
     const feedback = document.getElementById('notificationFeedback');
     if (!menu || !toggle || !panel || !list || !badge) return;
 
-    const endpoint = '/vehicle-document-manager/notifications/api.php';
+    const endpoint = '/notifications/api.php';
     const csrfToken = menu.dataset.csrf || '';
     let loaded = false;
     let loading = false;

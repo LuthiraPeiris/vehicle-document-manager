@@ -19,11 +19,11 @@ if (empty($_SESSION['user_id'])) {
         } else {
             // Invalid token, clear it and redirect
             setcookie('remember_token', '', time() - 3600, '/');
-            header('Location: /vehicle-document-manager/auth/login.php');
+            header('Location: /auth/login.php');
             exit;
         }
     } else {
-        header('Location: /vehicle-document-manager/auth/login.php');
+        header('Location: /auth/login.php');
         exit;
     }
 }

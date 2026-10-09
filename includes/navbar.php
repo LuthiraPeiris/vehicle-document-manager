@@ -105,4 +105,4 @@ if ($initials === '') {
     </div>
 
 </nav>
-<script src="/vehicle-document-manager/assets/js/notifications.js" defer></script>
+<script src="/assets/js/notifications.js" defer></script>

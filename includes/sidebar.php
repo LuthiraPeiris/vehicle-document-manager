@@ -25,7 +25,7 @@ require_once __DIR__ . '/page-context.php';
 
         <!-- Dashboard -->
         <a
-            href="/vehicle-document-manager/dashboard.php"
+            href="/dashboard.php"
             class="sidebar-link <?= $currentSection === 'dashboard' ? 'active' : '' ?>"
         >
             <i class="bi bi-grid-1x2-fill"></i>
@@ -34,7 +34,7 @@ require_once __DIR__ . '/page-context.php';
 
         <!-- Vehicles -->
         <a
-            href="/vehicle-document-manager/vehicles/"
+            href="/vehicles/"
             class="sidebar-link <?= $currentSection === 'vehicles' ? 'active' : '' ?>"
         >
             <i class="bi bi-car-front"></i>
@@ -43,7 +43,7 @@ require_once __DIR__ . '/page-context.php';
 
         <!-- Documents -->
         <a
-            href="/vehicle-document-manager/documents/"
+            href="/documents/"
             class="sidebar-link <?= $currentSection === 'documents' ? 'active' : '' ?>"
         >
             <i class="bi bi-file-earmark-text"></i>
@@ -52,7 +52,7 @@ require_once __DIR__ . '/page-context.php';
 
         <!-- Renewals -->
         <a
-            href="/vehicle-document-manager/documents/renewals.php"
+            href="/documents/renewals.php"
             class="sidebar-link <?= $currentSection === 'renewals' ? 'active' : '' ?>"
         >
             <i class="bi bi-arrow-repeat"></i>
@@ -61,7 +61,7 @@ require_once __DIR__ . '/page-context.php';
 
         <!-- Renewal History -->
         <a
-            href="/vehicle-document-manager/documents/renewal_history.php"
+            href="/documents/renewal_history.php"
             class="sidebar-link <?= $currentSection === 'renewal_history' ? 'active' : '' ?>"
         >
             <i class="bi bi-clock-history"></i>
@@ -75,7 +75,7 @@ require_once __DIR__ . '/page-context.php';
 
         <!-- Profile -->
         <a
-            href="/vehicle-document-manager/profile.php"
+            href="/profile.php"
             class="sidebar-link <?= $currentSection === 'profile' ? 'active' : '' ?>"
         >
             <i class="bi bi-person-circle"></i>
@@ -84,7 +84,7 @@ require_once __DIR__ . '/page-context.php';
 
         <!-- Logout -->
         <a
-            href="/vehicle-document-manager/auth/logout.php"
+            href="/auth/logout.php"
             class="sidebar-link logout-link"
         >
             <i class="bi bi-box-arrow-right"></i>
