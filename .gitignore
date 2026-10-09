@@ -6,13 +6,6 @@
 # Cloudflare R2 / Aiven certificate
 aiven-ca.pem
 
-# OAuth configuration containing secrets
-/config/google-oauth.php
-
-# Cloudflare Worker configuration containing API secret
-/config/cloud-notification.php
-/config/cloud-notifications.php
-
 # Local mail configuration
 vehicle-document-manager-mail.php
 /mail-config.php
