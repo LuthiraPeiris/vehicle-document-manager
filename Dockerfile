@@ -13,12 +13,19 @@ WORKDIR /var/www/html
 
 COPY . /var/www/html/
 
-RUN a2enmod rewrite
+# Configure Apache port 10000 for Render and enable mod_rewrite at build time
+RUN a2enmod rewrite \
+    && sed -i 's/Listen 80/Listen 10000/' /etc/apache2/ports.conf \
+    && sed -i 's/:80>/:10000>/' /etc/apache2/sites-available/000-default.conf
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 RUN composer install --no-dev --prefer-dist --optimize-autoloader
 
+# Set entrypoint script
+RUN chmod +x /var/www/html/docker-entrypoint.sh
+
 EXPOSE 10000
 
-CMD ["sh", "-c", "cp /etc/secrets/aiven-ca.pem /tmp/aiven-ca.pem && chmod 644 /tmp/aiven-ca.pem && sed -i 's/Listen 80/Listen 10000/' /etc/apache2/ports.conf && sed -i 's/:80>/:10000>/' /etc/apache2/sites-available/000-default.conf && apache2-foreground"]
+ENTRYPOINT ["/var/www/html/docker-entrypoint.sh"]
+CMD ["apache2-foreground"]
