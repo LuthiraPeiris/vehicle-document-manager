@@ -1,0 +1,7 @@
+.git
+.github
+vendor
+.env
+aiven-ca.pem
+storage/*
+!storage/.htaccess
