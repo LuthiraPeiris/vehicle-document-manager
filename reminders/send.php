@@ -31,7 +31,9 @@ try {
     // Load PHPMailer installed by Composer.
     require_once __DIR__ . '/../vendor/autoload.php';
 
-    // Load SMTP credentials from environment variables, or fallback to file if available.
+    // Load configuration
+    $brevoApiKey = trim((string) (getenv('BREVO_API_KEY') ?: ''));
+
     $mailConfig = [];
     $mailConfigPath = 'C:\\xampp\\private\\vehicle-document-manager-mail.php';
 
@@ -39,23 +41,24 @@ try {
         $mailConfig = require $mailConfigPath;
     }
 
-    $mailConfig = [
-        'host' => getenv('SMTP_HOST') ?: ($mailConfig['host'] ?? ''),
-        'port' => (int) (getenv('SMTP_PORT') ?: ($mailConfig['port'] ?? 587)),
-        'encryption' => strtolower((string) (getenv('SMTP_ENCRYPTION') ?: ($mailConfig['encryption'] ?? 'tls'))),
-        'username' => getenv('SMTP_USER') ?: ($mailConfig['username'] ?? ''),
-        'password' => getenv('SMTP_PASSWORD') ?: ($mailConfig['password'] ?? ''),
-        'from_email' => getenv('SMTP_FROM_EMAIL') ?: ($mailConfig['from_email'] ?? ''),
-        'from_name' => getenv('SMTP_FROM_NAME') ?: ($mailConfig['from_name'] ?? 'VehicleCare'),
-    ];
+    $fromEmail = getenv('SMTP_FROM_EMAIL') ?: ($mailConfig['from_email'] ?? ($mailConfig['username'] ?? ''));
+    $fromName  = getenv('SMTP_FROM_NAME') ?: ($mailConfig['from_name'] ?? 'VehicleCare');
 
-    if ($mailConfig['from_email'] === '' && $mailConfig['username'] !== '') {
-        $mailConfig['from_email'] = $mailConfig['username'];
-    }
+    if ($brevoApiKey === '') {
+        $mailConfig = [
+            'host' => getenv('SMTP_HOST') ?: ($mailConfig['host'] ?? ''),
+            'port' => (int) (getenv('SMTP_PORT') ?: ($mailConfig['port'] ?? 587)),
+            'encryption' => strtolower((string) (getenv('SMTP_ENCRYPTION') ?: ($mailConfig['encryption'] ?? 'tls'))),
+            'username' => getenv('SMTP_USER') ?: ($mailConfig['username'] ?? ''),
+            'password' => getenv('SMTP_PASSWORD') ?: ($mailConfig['password'] ?? ''),
+            'from_email' => $fromEmail,
+            'from_name' => $fromName,
+        ];
 
-    foreach (['host', 'port', 'encryption', 'username', 'password', 'from_email', 'from_name'] as $key) {
-        if (!isset($mailConfig[$key]) || $mailConfig[$key] === '') {
-            throw new RuntimeException("Missing mail configuration setting: {$key}");
+        foreach (['host', 'port', 'encryption', 'username', 'password', 'from_email', 'from_name'] as $key) {
+            if (!isset($mailConfig[$key]) || $mailConfig[$key] === '') {
+                throw new RuntimeException("Missing mail configuration setting: {$key}. (Set BREVO_API_KEY for HTTPS delivery, or SMTP_* variables for SMTP delivery).");
+            }
         }
     }
 
@@ -127,60 +130,110 @@ try {
         $safeExpiryDate = htmlspecialchars($expiryDate, ENT_QUOTES, 'UTF-8');
         $safeMessage = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
 
+        $htmlBody = "
+            <div style=\"font-family:Arial,sans-serif;line-height:1.6;\">
+                <h2>Document Expiry Reminder</h2>
+                <p>Hello {$safeName},</p>
+                <p>{$safeMessage}</p>
+                <p><strong>Document:</strong> {$safeDocumentType}</p>
+                <p><strong>Expiry date:</strong> {$safeExpiryDate}</p>
+                <p>Please log in to Vehicle Document Manager to review your document.</p>
+                <p>Regards,<br>Vehicle Document Manager</p>
+            </div>
+        ";
+
+        $altBody =
+            "Hello {$name},\n\n" .
+            "{$message}\n" .
+            "Document: {$documentType}\n" .
+            "Expiry date: {$expiryDate}\n\n" .
+            "Please log in to Vehicle Document Manager to review your document.\n\n" .
+            "Regards,\nVehicle Document Manager";
+
+        $subject = 'Document Expiry Reminder - Vehicle Document Manager';
+
         try {
-            $mail = new PHPMailer(true);
+            if ($brevoApiKey !== '') {
+                // Production: Send via Brevo HTTPS REST API (Port 443)
+                $ch = curl_init('https://api.brevo.com/v3/smtp/email');
+                $payload = json_encode([
+                    'sender' => [
+                        'name' => $fromName,
+                        'email' => $fromEmail,
+                    ],
+                    'to' => [
+                        [
+                            'email' => $reminder['email'],
+                            'name' => $reminder['full_name'],
+                        ],
+                    ],
+                    'subject' => $subject,
+                    'htmlContent' => $htmlBody,
+                    'textContent' => $altBody,
+                ], JSON_UNESCAPED_SLASHES);
 
-            $mail->isSMTP();
-            $mail->Host = $mailConfig['host'];
-            $mail->SMTPAuth = true;
-            $mail->Username = $mailConfig['username'];
-            $mail->Password = $mailConfig['password'];
-            $mail->Port = (int) $mailConfig['port'];
-            $mail->CharSet = 'UTF-8';
-            $mail->Timeout = 20;
+                curl_setopt_array($ch, [
+                    CURLOPT_POST => true,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT => 20,
+                    CURLOPT_HTTPHEADER => [
+                        'api-key: ' . $brevoApiKey,
+                        'Content-Type: application/json',
+                        'Accept: application/json',
+                    ],
+                    CURLOPT_POSTFIELDS => $payload,
+                ]);
 
-            if (strtolower($mailConfig['encryption']) === 'tls') {
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            } elseif (strtolower($mailConfig['encryption']) === 'ssl') {
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+                $response = curl_exec($ch);
+                $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $curlError = curl_error($ch);
+                curl_close($ch);
+
+                if ($response === false || $httpCode < 200 || $httpCode >= 300) {
+                    throw new RuntimeException(sprintf(
+                        'Brevo API error (HTTP %d): %s',
+                        $httpCode,
+                        $response !== false ? $response : $curlError
+                    ));
+                }
             } else {
-                throw new RuntimeException('Unsupported SMTP encryption setting.');
+                // Local Development: Fallback to PHPMailer SMTP
+                $mail = new PHPMailer(true);
+
+                $mail->isSMTP();
+                $mail->Host = $mailConfig['host'];
+                $mail->SMTPAuth = true;
+                $mail->Username = $mailConfig['username'];
+                $mail->Password = $mailConfig['password'];
+                $mail->Port = (int) $mailConfig['port'];
+                $mail->CharSet = 'UTF-8';
+                $mail->Timeout = 20;
+
+                if (strtolower($mailConfig['encryption']) === 'tls') {
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                } elseif (strtolower($mailConfig['encryption']) === 'ssl') {
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+                } else {
+                    throw new RuntimeException('Unsupported SMTP encryption setting.');
+                }
+
+                $mail->setFrom(
+                    $mailConfig['from_email'],
+                    $mailConfig['from_name']
+                );
+
+                $mail->addAddress(
+                    $reminder['email'],
+                    $reminder['full_name']
+                );
+
+                $mail->isHTML(true);
+                $mail->Subject = $subject;
+                $mail->Body = $htmlBody;
+                $mail->AltBody = $altBody;
+
+                $mail->send();
             }
-
-            $mail->setFrom(
-                $mailConfig['from_email'],
-                $mailConfig['from_name']
-            );
-
-            $mail->addAddress(
-                $reminder['email'],
-                $reminder['full_name']
-            );
-
-            $mail->isHTML(true);
-            $mail->Subject = 'Document Expiry Reminder - Vehicle Document Manager';
-
-            $mail->Body = "
-                <div style=\"font-family:Arial,sans-serif;line-height:1.6;\">
-                    <h2>Document Expiry Reminder</h2>
-                    <p>Hello {$safeName},</p>
-                    <p>{$safeMessage}</p>
-                    <p><strong>Document:</strong> {$safeDocumentType}</p>
-                    <p><strong>Expiry date:</strong> {$safeExpiryDate}</p>
-                    <p>Please log in to Vehicle Document Manager to review your document.</p>
-                    <p>Regards,<br>Vehicle Document Manager</p>
-                </div>
-            ";
-
-            $mail->AltBody =
-                "Hello {$name},\n\n" .
-                "{$message}\n" .
-                "Document: {$documentType}\n" .
-                "Expiry date: {$expiryDate}\n\n" .
-                "Please log in to Vehicle Document Manager to review your document.\n\n" .
-                "Regards,\nVehicle Document Manager";
-
-            $mail->send();
 
             // Mark as sent only if the document is still current.
             $updateStmt = $pdo->prepare("
