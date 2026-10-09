@@ -17,7 +17,7 @@ if (empty($_SESSION['csrf_token'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email'] ?? '');
+    $email = strtolower(trim($_POST['email'] ?? ''));
     $csrfToken = $_POST['csrf_token'] ?? '';
 
     if (!is_string($csrfToken) || !hash_equals($_SESSION['csrf_token'], $csrfToken)) {
@@ -29,6 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare('SELECT id FROM users WHERE email = :email LIMIT 1');
             $stmt->execute(['email' => $email]);
             $user = $stmt->fetch();
+
+            $brevoApiKey = trim((string) (getenv('BREVO_API_KEY') ?: ''));
 
             if ($user) {
                 $token = bin2hex(random_bytes(32));
@@ -49,10 +51,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $smtpUser = getenv('SMTP_USER') ?: ($mailConfig['username'] ?? '');
                 $smtpPass = getenv('SMTP_PASSWORD') ?: ($mailConfig['password'] ?? '');
                 $smtpEnc  = strtolower((string) (getenv('SMTP_ENCRYPTION') ?: ($mailConfig['encryption'] ?? 'tls')));
-                $fromEmail = getenv('SMTP_FROM_EMAIL') ?: ($mailConfig['from_email'] ?? $smtpUser);
+                $fromEmail = getenv('SMTP_FROM_EMAIL') ?: (getenv('SMTP_USER') ?: ($mailConfig['from_email'] ?? ($mailConfig['username'] ?? '')));
                 $fromName  = getenv('SMTP_FROM_NAME') ?: ($mailConfig['from_name'] ?? 'VehicleCare');
+                $subject   = 'Password Reset - VehicleCare';
 
-                if ($smtpHost !== '' && $smtpUser !== '' && $smtpPass !== '') {
+                $htmlBody = "
+                    <div style=\"font-family:Arial,sans-serif;line-height:1.6;\">
+                        <h2>Password Reset Request</h2>
+                        <p>Hello,</p>
+                        <p>We received a request to reset your password for VehicleCare. Click the link below to set a new password:</p>
+                        <p><a href=\"{$resetLink}\">Reset Password</a></p>
+                        <p>If you did not request a password reset, please ignore this email.</p>
+                        <p>Regards,<br>VehicleCare Team</p>
+                    </div>
+                ";
+
+                $altBody = "Hello,\n\nWe received a request to reset your password for VehicleCare. Please visit the following link to set a new password:\n\n{$resetLink}\n\nIf you did not request a password reset, please ignore this email.\n\nRegards,\nVehicleCare Team";
+
+                if ($brevoApiKey !== '') {
+                    // Production: Send via Brevo HTTPS REST API (Port 443)
+                    if ($fromEmail === '') {
+                        error_log('Brevo API password reset failed: Sender email is empty. Please set SMTP_FROM_EMAIL or SMTP_USER in environment variables.');
+                    } else {
+                        $ch = curl_init('https://api.brevo.com/v3/smtp/email');
+                        $payload = json_encode([
+                            'sender' => [
+                                'name' => $fromName,
+                                'email' => $fromEmail,
+                            ],
+                            'to' => [
+                                [
+                                    'email' => $email,
+                                ],
+                            ],
+                            'subject' => $subject,
+                            'htmlContent' => $htmlBody,
+                            'textContent' => $altBody,
+                        ], JSON_UNESCAPED_SLASHES);
+
+                        curl_setopt_array($ch, [
+                            CURLOPT_POST => true,
+                            CURLOPT_RETURNTRANSFER => true,
+                            CURLOPT_TIMEOUT => 20,
+                            CURLOPT_HTTPHEADER => [
+                                'api-key: ' . $brevoApiKey,
+                                'Content-Type: application/json',
+                                'Accept: application/json',
+                            ],
+                            CURLOPT_POSTFIELDS => $payload,
+                        ]);
+
+                        $response = curl_exec($ch);
+                        $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                        $curlError = curl_error($ch);
+                        curl_close($ch);
+
+                        if ($response === false || $httpCode < 200 || $httpCode >= 300) {
+                            error_log(sprintf(
+                                'Brevo API password reset failed (HTTP %d): %s',
+                                $httpCode,
+                                $response !== false ? $response : $curlError
+                            ));
+                        }
+                    }
+                } elseif ($smtpHost !== '' && $smtpUser !== '' && $smtpPass !== '') {
+                    // Local Development: Fallback to PHPMailer SMTP
                     $mail = new PHPMailer(true);
 
                     try {
@@ -71,28 +134,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
                         }
 
-                        $mail->setFrom($fromEmail, $fromName);
+                        $mail->setFrom($fromEmail ?: $smtpUser, $fromName);
                         $mail->addAddress($email);
 
                         $mail->isHTML(true);
-                        $mail->Subject = 'Password Reset - VehicleCare';
-
-                        $mail->Body = "
-                            <div style=\"font-family:Arial,sans-serif;line-height:1.6;\">
-                                <h2>Password Reset Request</h2>
-                                <p>Hello,</p>
-                                <p>We received a request to reset your password for VehicleCare. Click the link below to set a new password:</p>
-                                <p><a href=\"{$resetLink}\">Reset Password</a></p>
-                                <p>If you did not request a password reset, please ignore this email.</p>
-                                <p>Regards,<br>VehicleCare Team</p>
-                            </div>
-                        ";
-
-                        $mail->AltBody = "Hello,\n\nWe received a request to reset your password for VehicleCare. Please visit the following link to set a new password:\n\n{$resetLink}\n\nIf you did not request a password reset, please ignore this email.\n\nRegards,\nVehicleCare Team";
+                        $mail->Subject = $subject;
+                        $mail->Body = $htmlBody;
+                        $mail->AltBody = $altBody;
 
                         $mail->send();
                     } catch (Throwable $e) {
-                        error_log('Failed to send password reset email: ' . $e->getMessage());
+                        error_log('Failed to send password reset email via SMTP: ' . $e->getMessage());
                     }
                 }
                 
